@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {useAuth} from '../../context/AuthContext'
 
 import {AiOutlineArrowRight} from 'react-icons/ai';
@@ -8,19 +8,18 @@ import {DivHeader} from './style';
 
 const Header = (props) => {
 
-   const [error, setError] = useState("");
-    const { /* currentUser, */ logout } = useAuth()
+
+   const { logout } = useAuth()
 
 	const history = useHistory();
 
 	async function handleLogout() {
-		setError('')
 
 		try {
 			await logout()
 			history.push('/login')
-		} catch (err){
-			setError('Failed to log out')
+		} catch (error){
+			console.log('Failed to log out')
 		}
    }
    

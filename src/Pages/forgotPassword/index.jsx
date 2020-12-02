@@ -9,7 +9,6 @@ import Form from '../../components/Form/Form';
 const ForgetPassword = () => {
 
    const [ error, setError ] = useState()
-   const [ loading, setLoading ] = useState(false)
    const [ message, setMessage ] = useState('')
 
    const emailRef = useRef()
@@ -21,14 +20,13 @@ const ForgetPassword = () => {
       try {
         setMessage('')
         setError('')
-        setLoading(true)
+
         await resetPassword(emailRef.current.value)
         setMessage('Email sent successfully ! check your inbox')
       } catch(err) {
          setError('Email not exist ')
       }
 
-        setLoading(false)   
    }
 
    let linkLog = (
