@@ -49,8 +49,8 @@ export default function Register() {
          setError('')
          setLoading(true)
          await onSignUpSubmit(nameRef.current.value, emailRef.current.value, passwordRef.current.value)
-         setEmptyErr(false),
-         setErrPwd(false),
+         setEmptyErr(false);
+         setErrPwd(false);
          setSucces(true)
 
          setTimeout(() => {
@@ -101,3 +101,5 @@ export default function Register() {
       </Container>
    );
 }
+
+
