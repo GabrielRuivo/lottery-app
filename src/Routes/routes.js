@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 
 import Login from '../Pages/Login/index';
 import ForgetPassword from '../Pages/forgotPassword/index';
@@ -13,6 +13,7 @@ export default function Routes() {
 	return (
 		<BrowserRouter>
 			<Switch>
+				<Route exact path="/"><Redirect to="/login" /></Route>
 				<Route path="/login" component={Login}/>
 				<Route path="/forgetPassword" component={ForgetPassword}/>
 				<Route path="/register" component={Register}/>
