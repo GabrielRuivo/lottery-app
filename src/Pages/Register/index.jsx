@@ -12,7 +12,10 @@ import Form from '../../components/Form/Form';
 import Spinner from '../../components/Spinner/Spinner';
 
 export default function Register() {
-   const [ error, setError ] = useState()
+   const [ error, setError ] = useState();
+   const [ errPwd, setErrPwd ] = useState();
+   const [ emptyErr, setEmptyErr ] = useState(false);
+   const [success, setSucces] = useState(false)
    const [ loading, setLoading ] = useState(false)
    
    const nameRef = useRef()
@@ -23,16 +26,36 @@ export default function Register() {
    const history = useHistory();
 
    async function handleSubmit(e) {
+      
+
       e.preventDefault()
       try {
+         if(nameRef.current.value === '' || emailRef.current.value === '' || passwordRef.current.value === '') {
+           return(
+            setEmptyErr(true),
+            setErrPwd(false),
+            setSucces(false)
+           )
+         } 
+
+         if(passwordRef.current.value.length < 6) {
+            return(
+               setEmptyErr(false),
+               setErrPwd(true),
+               setSucces(false)
+            ) 
+         }
+         
          setError('')
          setLoading(true)
          await onSignUpSubmit(nameRef.current.value, emailRef.current.value, passwordRef.current.value)
-         alert('CADASTRO REALIZADO COM SUCESSO !')
+         setEmptyErr(false),
+         setErrPwd(false),
+         setSucces(true)
 
          setTimeout(() => {
             history.push("/login")
-         }, 1000);
+         }, 4000);
          
       } catch (err) {
          setError('Failed to create an account')
@@ -70,6 +93,9 @@ export default function Register() {
             <Input type="email" refs={emailRef} placeholder="Email" required />
             <Input type="password" refs={passwordRef} placeholder="Password" required />
 
+            {emptyErr && <div className="span-message-error" >Correctly fill in the fields !</div>}
+            {success && <div className="span-message-send" >successful registration!!!</div>}
+            {errPwd && <div className="span-message-error" >The password field must be at least 6 characters !</div>}
             {error && <span>{error}</span>}
          </Form>
       </Container>

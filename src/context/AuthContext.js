@@ -24,8 +24,7 @@ export function AuthProvider({children}) {
            // do usuário no firebase
            await result.user.updateProfile({
              displayName: name
-             // se você quiser também pode passar a URL
-             // de uma imagem como foto do perfil só tirar o comentário da linha de baixo
+
              // photoURL: URL_DA_IMAGEM_DE_PERFIL
            })
         } catch (error) {
