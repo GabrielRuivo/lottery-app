@@ -7,6 +7,10 @@ export const Container = styled.div`
   justify-content: center;
   background: #F7F7F7;
 
+  input:focus {
+      border: 1px solid lightgreen;
+  }
+
   input{
     margin-top: 0;
     width: 100%;
@@ -21,6 +25,11 @@ export const Container = styled.div`
     border-top-left-radius: 10px; 
     border-top-right-radius: 10px;
     border-bottom: 1px solid #ddd;
+  }
+
+  input + input {
+    border-top-left-radius: 0px; 
+    border-top-right-radius: 0px;
   }
 
   

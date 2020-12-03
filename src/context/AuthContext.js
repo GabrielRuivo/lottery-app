@@ -16,7 +16,7 @@ export function AuthProvider({children}) {
     }
 
     async function onSignUpSubmit(name, email, password) {
-        try {
+/*         try { */
            // faz o signup apenas com e-mail e password aqui
            const result = await signup(email, password)
      
@@ -27,10 +27,11 @@ export function AuthProvider({children}) {
 
              // photoURL: URL_DA_IMAGEM_DE_PERFIL
            })
-        } catch (error) {
+       /*  } catch (error) {
            // trate o erro
            console.log("erro", { error })
-        } 
+           setCurrentUser(true)
+        }  */
     }
 
     function login (email, password) {
@@ -59,7 +60,7 @@ export function AuthProvider({children}) {
         signup,
         logout,
         onSignUpSubmit,
-        resetPassword
+        resetPassword,
     }
 
     return (

@@ -12,43 +12,49 @@ import Form from '../../components/Form/Form';
 import Spinner from '../../components/Spinner/Spinner';
 
 export default function Register() {
-   const [ error, setError ] = useState();
+   const [ error, setError ] = useState(false);
    const [ errPwd, setErrPwd ] = useState();
    const [ emptyErr, setEmptyErr ] = useState(false);
-   const [success, setSucces] = useState(false)
+   const [ success, setSucces ] = useState(false)
    const [ loading, setLoading ] = useState(false)
    
    const nameRef = useRef()
    const emailRef = useRef()
    const passwordRef = useRef()
-   const { onSignUpSubmit } = useAuth()
+   const { onSignUpSubmit, currentUser } = useAuth()
 
    const history = useHistory();
 
-   async function handleSubmit(e) {
-      
+   function inputFocus() {
+      nameRef.current.focus();
+   }
 
+   async function handleSubmit(e) {
       e.preventDefault()
+
       try {
          if(nameRef.current.value === '' || emailRef.current.value === '' || passwordRef.current.value === '') {
-           return(
-            setEmptyErr(true),
-            setErrPwd(false),
-            setSucces(false)
-           )
+            return(
+               setEmptyErr(true),
+               setErrPwd(false),
+               setSucces(false),
+               setError(false)
+            )
          } 
 
          if(passwordRef.current.value.length < 6) {
             return(
                setEmptyErr(false),
                setErrPwd(true),
-               setSucces(false)
+               setSucces(false),
+               setError(false)
             ) 
          }
-         
-         setError('')
+
+         setError(false)
          setLoading(true)
          await onSignUpSubmit(nameRef.current.value, emailRef.current.value, passwordRef.current.value)
+
          setEmptyErr(false);
          setErrPwd(false);
          setSucces(true)
@@ -57,10 +63,16 @@ export default function Register() {
             history.push("/login")
          }, 4000);
          
-      } catch (err) {
-         setError('Failed to create an account')
+      } catch(e) {
+         console.log('Err', e)
+         setError(true)
+         setEmptyErr(false);
+         setErrPwd(false);
+         setSucces(false)
+         
       }
       setLoading(false)
+
    }
 
    let linkSig = (
@@ -89,14 +101,14 @@ export default function Register() {
             icon2={<AiOutlineArrowLeft/>}
          >
             {loading ? <Spinner /> : ''}
-            <Input type="text" refs={nameRef} placeholder="Your name" required />
+            <Input onClick={inputFocus} type="text" refs={nameRef} placeholder="Your name" required />
             <Input type="email" refs={emailRef} placeholder="Email" required />
             <Input type="password" refs={passwordRef} placeholder="Password" required />
 
             {emptyErr && <div className="span-message-error" >Correctly fill in the fields !</div>}
             {success && <div className="span-message-send" >successful registration!!!</div>}
             {errPwd && <div className="span-message-error" >The password field must be at least 6 characters !</div>}
-            {error && <span>{error}</span>}
+            {error && <div className="span-message-error" >The email address is already in use by another account.</div> }
          </Form>
       </Container>
    );
