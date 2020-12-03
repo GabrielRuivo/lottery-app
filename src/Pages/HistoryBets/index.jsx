@@ -13,12 +13,11 @@ const HistoryBets = (props) => {
   let userName = user.currentUser.displayName
 
   const store = useSelector(state => state)
-  console.log('BETS SAVED:', store.data_lotofacil_to_save)
 
   const [lotofacilActive, setLotofacilActive] = useState(false);
   const [megasenaActive, setMegasenaActive] = useState(false);
   const [lotomaniaActive, setLotomaniaActive] = useState(false);
-  console.log('STORE REDUX:', store)
+
   return (  
     <div>
       <Header navLink1={userName} navLink2="Log out" />

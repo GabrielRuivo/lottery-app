@@ -20,8 +20,6 @@ const persistedReducer = persistReducer(persistConfig, reducer);
 const store = createStore(persistedReducer)
 const persistor = persistStore(store);
 
-/* export default {store, persistor} */
-
 ReactDOM.render(
   <Provider store={store} >
     <PersistGate loading={null} persistor={persistor}>
