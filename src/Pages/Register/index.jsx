@@ -21,7 +21,7 @@ export default function Register() {
    const nameRef = useRef()
    const emailRef = useRef()
    const passwordRef = useRef()
-   const { onSignUpSubmit, currentUser } = useAuth()
+   const { onSignUpSubmit } = useAuth()
 
    const history = useHistory();
 

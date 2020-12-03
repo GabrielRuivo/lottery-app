@@ -21,7 +21,7 @@ const HistoryBets = (props) => {
   console.log('STORE REDUX:', store)
   return (  
     <div>
-      <Header navLink1={userName} navLink2="Sair" />
+      <Header navLink1={userName} navLink2="Log out" />
       <Main>
         <SubHeader>
 

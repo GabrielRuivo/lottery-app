@@ -17,6 +17,14 @@ const INITIAL_STATE = {
 function reducer(state = INITIAL_STATE, action){
    switch(action.type) {
 
+      case 'CLEAR_STATE': 
+         return {
+            ...state,
+            data_lotofacil_to_save: [], 
+            data_megasena_to_save: [], 
+            data_lotomania_to_save: [], 
+         }
+
       case 'ADD_TO_CART_LOTOFACIL': 
          return {
             ...state, 

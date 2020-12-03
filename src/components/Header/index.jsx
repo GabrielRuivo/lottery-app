@@ -4,16 +4,22 @@ import {useAuth} from '../../context/AuthContext'
 import {AiOutlineArrowRight} from 'react-icons/ai';
 import {NavLink, useHistory} from 'react-router-dom';
 
+import {useDispatch} from 'react-redux';
 import {DivHeader} from './style';
+
+
 
 const Header = (props) => {
 
-
+   const dispatch = useDispatch();
+   
    const { logout } = useAuth()
 
 	const history = useHistory();
 
 	async function handleLogout() {
+
+      dispatch({type: 'CLEAR_STATE'})
 
 		try {
 			await logout()
