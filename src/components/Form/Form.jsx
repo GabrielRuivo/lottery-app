@@ -27,7 +27,7 @@ const Logo = props => {
          {
             props.icon2.type.name === 'AiOutlineArrowLeft'
             ? <NavLink className="link-2" to={props.linkRedirect2} > {props.icon2} {props.link2} </NavLink>
-            : <NavLink className="link-2" to={props.linkRedirect2} > {props.link2} {props.icon2} </NavLink>
+            : <NavLink className="link-2" to={props.linkRedirect2} > {props.link2} {props.icon1} </NavLink>
          }
          
       </Container>

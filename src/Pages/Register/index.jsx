@@ -54,7 +54,6 @@ export default function Register() {
          setError(false)
          setLoading(true)
          await onSignUpSubmit(nameRef.current.value, emailRef.current.value, passwordRef.current.value)
-
          setEmptyErr(false);
          setErrPwd(false);
          setSucces(true)
