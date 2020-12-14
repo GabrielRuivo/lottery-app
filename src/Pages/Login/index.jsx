@@ -1,5 +1,5 @@
 import React, {useState, useRef} from 'react';
-import { useHistory } from 'react-router-dom';
+/* import { useHistory } from 'react-router-dom'; */
 import { useAuth } from '../../context/AuthContext';
 
 import {AiOutlineArrowRight} from 'react-icons/ai';
@@ -16,7 +16,7 @@ const Login = () => {
    const [ error, setError ] = useState()
    const [ loading, setLoading ] = useState(false)
 
-   const history = useHistory();
+   /* const history = useHistory(); */
 
    const emailRef = useRef()
    const passwordRef = useRef()

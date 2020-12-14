@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext'
 import { AiOutlineShoppingCart, AiOutlineArrowRight } from 'react-icons/ai';
 import { BsTrash } from 'react-icons/bs';
-import { useSelector, useDispatch } from 'react-redux';
+import { /* useSelector,  */useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import api from '../../services/api';
 
