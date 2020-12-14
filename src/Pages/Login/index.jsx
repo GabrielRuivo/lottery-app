@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 
 import {AiOutlineArrowRight} from 'react-icons/ai';
 
-import {Container} from './style';
+import {Container, AnimationLogo} from './style';
 import Input from '../../components/Input/Input';
 import Logo from '../../components/Logo/Logo.jsx';
 import Form from '../../components/Form/Form';
@@ -29,7 +29,7 @@ const Login = () => {
          setError('')
          setLoading(true)
          await login(emailRef.current.value, passwordRef.current.value)
-         history.push("/historyBets")
+        /*  history.push("/history-bets") */
       } catch(err) {
          setError('Email or password invalid')
       }
@@ -49,7 +49,10 @@ const Login = () => {
 
       return (
          <Container>
-            <Logo />
+            <AnimationLogo>
+               <Logo />
+            </AnimationLogo>
+            
             <Form 
                onSubmit={handleSubmit}
                title="Authentication" 
@@ -62,8 +65,8 @@ const Login = () => {
                icon2={<AiOutlineArrowRight/>}
             >
                {loading ? <Spinner /> : ''}
-               <Input type="email" refs={emailRef} placeholder="Email" required />
-               <Input type="password" refs={passwordRef} placeholder="Password" required />
+                  <Input type="email" refs={emailRef} placeholder="Email" required />
+                  <Input className="input-no-radius" type="password" refs={passwordRef} placeholder="Password" required />
                {error && <div className="span-message-error" >{error}</div>}
                
             </Form>

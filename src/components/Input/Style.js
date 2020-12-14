@@ -22,15 +22,6 @@ export const Container = styled.div`
     font-weight: bold;
     opacity: 0.8;
     border: none;
-    border-top-left-radius: 10px; 
-    border-top-right-radius: 10px;
-    border-bottom: 1px solid #ddd;
+    
   }
-
-  input + input {
-    border-top-left-radius: 0px; 
-    border-top-right-radius: 0px;
-  }
-
-  
 `; 

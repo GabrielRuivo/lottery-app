@@ -7,31 +7,20 @@ export function useAuth() {
     return useContext(AuthContext)
 }
 
-export function AuthProvider({children}) {
+export function AuthProvider({ children }) {
     const [currentUser, setCurrentUser] = useState();
-    const [loading, setLoading] = useState();
+    const [loading, setLoading] = useState(true);
 
     function signup(email, password) {
         return auth.createUserWithEmailAndPassword(email, password)
     }
 
     async function onSignUpSubmit(name, email, password) {
-/*         try { */
-           // faz o signup apenas com e-mail e password aqui
-           const result = await signup(email, password)
-     
-           // logo em seguida atualiza as informações
-           // do usuário no firebase
-           await result.user.updateProfile({
-             displayName: name
+        const result = await signup(email, password)
 
-             // photoURL: URL_DA_IMAGEM_DE_PERFIL
-           })
-       /*  } catch (error) {
-           // trate o erro
-           console.log("erro", { error })
-           setCurrentUser(true)
-        }  */
+        await result.user.updateProfile({
+            displayName: name,
+        })
     }
 
     function login (email, password) {
@@ -39,7 +28,11 @@ export function AuthProvider({children}) {
     }
 
     function logout() {
-        return auth.signOut()
+        return new Promise(async(resolve) => {
+            await auth.signOut();
+            setCurrentUser(null);
+            resolve();
+        })
     }
 
     function resetPassword(email) {
@@ -47,6 +40,9 @@ export function AuthProvider({children}) {
     }
 
     useEffect(() => {
+        setCurrentUser(auth.currentUser)
+        setLoading(false)
+
         const unsubscribe = auth.onAuthStateChanged(user => {
             setCurrentUser(user)
             setLoading(false)
@@ -61,6 +57,7 @@ export function AuthProvider({children}) {
         logout,
         onSignUpSubmit,
         resetPassword,
+        loading
     }
 
     return (

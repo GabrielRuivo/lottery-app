@@ -46,6 +46,11 @@ export const Container = styled.div`
     border-radius: 10px;
     margin: 25px 0px;
 
+    .input-no-radius {
+      border-top-left-radius: 0px;
+      border-top-right-radius: 0px;
+    }
+
   input {
     margin-top: 0;
     width: 100%;
@@ -57,10 +62,11 @@ export const Container = styled.div`
     font-weight: bold;
     opacity: 0.8;
     border: none;
-    border-top-left-radius: 10px; 
-    border-top-right-radius: 10px;
     border-bottom: 1px solid #ddd;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
   }
+
 
   .div-link-forget {
     width: 100%;

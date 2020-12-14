@@ -3,7 +3,7 @@ import React, { useRef, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useHistory } from 'react-router-dom';
 import { AiOutlineArrowRight, AiOutlineArrowLeft } from 'react-icons/ai';
-import { Container } from './style';
+import { Container, AnimationLogo } from './style';
 
 import Input from '../../components/Input/Input';
 import Logo from '../../components/Logo/Logo.jsx';
@@ -86,8 +86,10 @@ export default function Register() {
 
    return (
       <Container>
-         <Logo />
-            
+         <AnimationLogo>
+            <Logo />
+         </AnimationLogo>
+          
          <Form 
             onSubmit={handleSubmit}
             title="Registration" 
@@ -101,8 +103,8 @@ export default function Register() {
          >
             {loading ? <Spinner /> : ''}
             <Input onClick={inputFocus} type="text" refs={nameRef} placeholder="Your name" required />
-            <Input type="email" refs={emailRef} placeholder="Email" required />
-            <Input type="password" refs={passwordRef} placeholder="Password" required />
+            <Input className="input-no-radius" type="email" refs={emailRef} placeholder="Email" required />
+            <Input className="input-no-radius" type="password" refs={passwordRef} placeholder="Password" required />
 
             {emptyErr && <div className="span-message-error" >Correctly fill in the fields !</div>}
             {success && <div className="span-message-send" >successful registration!!!</div>}

@@ -6,11 +6,7 @@ const Input = (props) => {
   return(
     <Container>
       <input 
-            className={
-               props.invalid && props.shouldValidate && props.touched
-               ? "valid" 
-               : "inputElement"
-            }   
+            className={props.className === 'input-no-radius' && 'input-no-radius'} 
             {...props.elementConfig} 
             value={props.value}
             onChange={props.changed}

@@ -37,11 +37,11 @@ const Header = (props) => {
          </div>
 
          <div className="div-link-home" >
-            <NavLink className="NavLink-home-header" to="/historyBets" >{props.historyBets}</NavLink>
+            <NavLink className="NavLink-home-header" to="/history-bets" >{props.historyBets}</NavLink>
          </div>
 
          <div className="div-links-header" >
-            <NavLink className="NavLink-1-header" to="/">{props.navLink1}</NavLink>
+            <span className="NavLink-1-header" >{props.navLink1}</span>
             <span  onClick={handleLogout} className="NavLink-2-header" to="/login">{props.navLink2} <AiOutlineArrowRight/></span>
          </div>
       </DivHeader>

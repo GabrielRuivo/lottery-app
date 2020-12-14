@@ -1,75 +1,121 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import {NavLink} from 'react-router-dom';
-import {AiOutlineArrowRight} from 'react-icons/ai';
+import { NavLink } from 'react-router-dom';
+import { AiOutlineArrowRight } from 'react-icons/ai';
 import Header from '../../components/Header/index';
-import {SubHeader, Main, Games} from './style';
+import { SubHeader, Main, Animation, Games } from './style';
 
 import {useSelector} from 'react-redux';
 
-const HistoryBets = (props) => {
+const HistoryBets = () => {
 
   const user = useAuth();
+  console.log(user)
   let userName = user.currentUser.displayName
 
   const store = useSelector(state => state)
+  console.log('STORE', store.bets)
 
-  const [lotofacilActive, setLotofacilActive] = useState(false);
-  const [megasenaActive, setMegasenaActive] = useState(false);
-  const [lotomaniaActive, setLotomaniaActive] = useState(false);
+  const [lotofacilActive, setLotofacilActive] = useState(true);
+  const [megasenaActive, setMegasenaActive]   = useState(true);
+  const [quinaActive, setLotomaniaActive] = useState(true);
+
+  function handleWithHistoryBets(game) {
+    if (game === 'lotofacil') {
+      if(store.bets.data_lotofacil_to_save.length > 0 ) {
+        setLotofacilActive(!lotofacilActive)
+      }
+    }
+
+    if (game === 'megasena') {
+      if(store.bets.data_megasena_to_save.length > 0 ) {
+        setMegasenaActive(!megasenaActive)
+      }
+    }
+
+    if (game === 'quina') {
+      if(store.bets.data_quina_to_save.length > 0 ) {
+        setLotomaniaActive(!quinaActive)
+      }
+    }
+  }
 
   return (  
     <div>
       <Header navLink1={userName} navLink2="Log out" />
       <Main>
+      <Animation>
         <SubHeader>
 
-          <h2>RECENT GAMES</h2> 
+          <h2>JOGOS RECENTES</h2> 
           <div className="filters" >
-            <p>Filters</p>
-            <button className="btn-lotofacil" onClick={() => setLotofacilActive(!lotofacilActive)} >Lotofácil</button>
-            <button className="btn-mega-sena" onClick={() => setMegasenaActive(!megasenaActive)} >Mega-Sena</button>
-            <button className="btn-lotomania" onClick={() => setLotomaniaActive(!lotomaniaActive)} >Lotomania</button>
+            <p>Filtros</p>
+            
+            <button 
+              className={lotofacilActive ? "btn-lotofacil-active" : "btn-lotofacil"} 
+              onClick={() => handleWithHistoryBets('lotofacil')} >Lotofácil
+            </button>
+
+            <button 
+              className={megasenaActive ? "btn-megasena-active" : "btn-megasena"} 
+              onClick={() => handleWithHistoryBets('megasena')} >Mega-Sena
+            </button>
+
+            <button 
+              className={quinaActive ? "btn-quina-active" : "btn-quina"}  
+              onClick={() => handleWithHistoryBets('quina')} >Quina
+            </button>
+
           </div>
 
-          <NavLink className="NavLink-New-Bet" to="/games" >New Bet<AiOutlineArrowRight/></NavLink>
+          <NavLink className="NavLink-New-Bet" to="/games" >Nova Aposta<AiOutlineArrowRight/></NavLink>
         </SubHeader>
         <Games>
+          
+          {
+            store.bets.data_lotofacil_to_save.length <= 0 && 
+            store.bets.data_megasena_to_save.length <= 0 && 
+            store.bets.data_quina_to_save.length <= 0 
+            && <p className="message-empty-bets" >
+                Você não tem nenhuma aposta salva, faça a sua agora clicando em nova aposta !
+              </p>
+          }
           {
           lotofacilActive ? 
             <React.Fragment>
               {
-                store.data_lotofacil_to_save.map((item, index) => {
-                  if(item.length > 1) {
+                store.bets.data_lotofacil_to_save.flat(1).map((item, index) => {
+                  console.log('ITEM LOTOFACIL', item)
+                  if(item.length > 0) {
                     return (
                       <div key={index} className="div-lotofacil" >
                         <span className="column-lotofacil" />
                         <div className="div-rows-lotofacil">
-                          <p><strong>{item.join(", ")}</strong></p>
-                          <p>{store.date} - (R$ 2,50)</p>
+                          <p><strong>{item.join(', ')}</strong></p>
+                          <p>{store.bets.date} - (R$ 2,50)</p>
                           <p><strong className="strong-lotofacil" >Lotofácil</strong></p>
                         </div>
                       </div> 
                     )
-                  } 
+                  }
                   return ''
                 })
               }
-            </React.Fragment>: ''
+            </React.Fragment> : ''
           }
 
           {
             megasenaActive ?
             <React.Fragment>
               {
-                store.data_megasena_to_save.map((item, index) => {
-                  if(item.length > 1) {
+                store.bets.data_megasena_to_save.flat(1).map((item, index) => {
+                  if(item.length > 0) {
                     return (
                       <div key={index} className="div-mega-sena" >
                         <span className="column-mega-sena" />
                         <div className="div-rows-mega-sena">
                           <p><strong>{item.join(", ")}</strong></p>
-                          <p>{store.date} - (R$ 4,50)</p>
+                          <p>{store.bets.date} - (R$ 4,50)</p>
                           <p><strong className="strong-mega-sena" >Mega Sena</strong></p>
                         </div>
                       </div>
@@ -83,18 +129,18 @@ const HistoryBets = (props) => {
           }
           
           {
-            lotomaniaActive ?
+            quinaActive ?
             <React.Fragment>
               {
-                store.data_lotomania_to_save.map((item, index) => {
-                  if(item.length > 1) {
+                store.bets.data_quina_to_save.flat(1).map((item, index) => {
+                  if(item.length > 0) {
                     return (
-                      <div key={index} className="div-lotomania" >
-                        <span className="column-lotomania" />
-                        <div className="div-rows-lotomania">
+                      <div key={index} className="div-quina" >
+                        <span className="column-quina" />
+                        <div className="div-rows-quina">
                           <p><strong>{item.join(", ")}</strong></p>
-                          <p>{store.date} - (R$ 3,50)</p>
-                          <p><strong className="strong-lotomania" >Lotomania</strong></p>
+                          <p>{store.bets.date} - (R$ 3,50)</p>
+                          <p><strong className="strong-quina" >Quina</strong></p>
                         </div>
                       </div>
                     );
@@ -106,6 +152,7 @@ const HistoryBets = (props) => {
           }
           
         </Games>
+        </Animation>
       </Main>
     </div>
   );

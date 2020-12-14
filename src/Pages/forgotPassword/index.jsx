@@ -1,7 +1,7 @@
-import React, {useState, useRef} from 'react';
+import React, { useState, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import {AiOutlineArrowRight, AiOutlineArrowLeft} from 'react-icons/ai';
-import {Container} from './style';
+import { AiOutlineArrowRight, AiOutlineArrowLeft } from 'react-icons/ai';
+import { Container, AnimationLogo } from './style';
 import Input from '../../components/Input/Input';
 import Logo from '../../components/Logo/Logo.jsx';
 import Form from '../../components/Form/Form';
@@ -40,7 +40,11 @@ const ForgetPassword = () => {
 
    return (
       <Container>
-         <Logo />
+
+         <AnimationLogo>
+            <Logo />
+         </AnimationLogo>
+         
          <Form 
             onSubmit={handleSubmit}
             title="Reset password" 

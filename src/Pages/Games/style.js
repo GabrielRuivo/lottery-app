@@ -1,4 +1,5 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
+import { shade } from 'polished';
 
 export const Container = styled.div`
     max-width: 1280px;
@@ -6,7 +7,23 @@ export const Container = styled.div`
     margin: 0 auto;
     display: grid;
     grid-template-columns: 1.00fr 0.50fr;
-    background: #eee;
+    background: #F7F7F7;
+`;
+
+const appearFromLeft = keyframes`
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
+
+export const Animation = styled.div`
+  animation: ${appearFromLeft} 1s;
 `;
 
 export const Main = styled.div`
@@ -36,23 +53,109 @@ export const ChooseGame = styled.div`
         margin-top: 1rem
     }
 
-    .btn-lotofacil {
-        border: none;
-        border: 2.5px solid purple;
-        color: purple;
-        }
-
-    .btn-mega-sena {
-        border: none;
-        border: 2.5px solid green;
-        background: green;
-        color: #fff;
+    .btn-lotofacil,
+    .btn-megasena,
+    .btn-quina {
+      background: none;
+      border-radius: 20px;
+      width: 8rem;
+      height: 2.2rem;
+      margin-right: 1rem;
+      font-family: Arial, Helvetica, sans-serif;
+      font-style: italic;
+      font-size: 15px;
+      font-weight: bold;
     }
 
-    .btn-lotomania {
-        border: none;
-        border: 2.5px solid orange;
-        color: orange;
+    .btn-lotofacil-active,
+    .btn-megasena-active,
+    .btn-quina-active {
+      background: none;
+      border-radius: 20px;
+      width: 8rem;
+      height: 2.2rem;
+      margin-right: 1rem;
+      font-family: Arial, Helvetica, sans-serif;
+      font-style: italic;
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    .btn-lotofacil {
+      border: none;
+      border: 2.5px solid purple;
+      color: purple;
+      transition: 0.5s;
+
+      &:hover {
+        background: ${shade(0.3, 'purple')};
+        color: #fff;
+      }
+
+    }
+    
+    .btn-lotofacil-active {
+      background: purple;
+      color: #fff;
+      border: none;
+      border: 2.5px solid purple;
+      transition: 0.5s;
+
+      &:hover {
+        background: ${shade(0.2, 'purple')};
+        color: #fff;
+      }
+    }
+
+    .btn-megasena {
+      border: none;
+      border: 2.5px solid green;
+      background: transparent;
+      color: green;
+      transition: 0.5s;
+
+      &:hover {
+        background: ${shade(0.2, 'green')};
+        color: #fff;
+      }
+    }
+
+    .btn-megasena-active {
+      background: green;
+      color: #fff;
+      border: none;
+      border: 2.5px solid green;
+      transition: 0.5s;
+
+      &:hover {
+        background: ${shade(0.2, 'green')};
+        color: #fff;
+      }
+    }
+
+    .btn-quina {
+      border: none;
+      border: 2.5px solid orange;
+      color: orange;
+      transition: 0.5s;
+
+      &:hover {
+        background: ${shade(0.2, 'orange')};
+        color: #fff;
+      }
+    }
+
+    .btn-quina-active {
+      background: orange;
+      color: #fff;
+      border: none;
+      border: 2.5px solid orange;
+      transition: 0.5s;
+
+      &:hover {
+        background: ${shade(0.2, 'orange')};
+        color: #fff;
+      }
     }
 
     p {
@@ -63,6 +166,8 @@ export const ChooseGame = styled.div`
         font-weight: bold;
     }
 `;
+
+
 export const Description = styled.div`
     margin-top: 1.5rem;
 
@@ -110,6 +215,12 @@ export const DivActionButtons = styled.div`
         width: 7.7rem;
         height: 2.4rem;
         color: green;
+        transition: 1s;
+
+        &:hover {
+            background: ${shade(0.2, 'green')};
+            color: #fff;
+        }
     }
 
     .btn-clear-game {
@@ -117,6 +228,12 @@ export const DivActionButtons = styled.div`
         width: 7.0rem;
         height: 2.4rem;
         color: green;
+        transition: 1s;
+
+        &:hover {
+            background: ${shade(0.2, 'green')};
+            color: #fff;
+        }
     }
 
     .btn-add-to-cart {
@@ -125,10 +242,15 @@ export const DivActionButtons = styled.div`
         justify-content: space-evenly;
 
         background: green;
-        width: 12rem;
+        width: 14rem;
         height: 3rem;
         color: white;
-        font-size: 18px;
+        font-size: 15px;
+        transition: 1s;
+
+        &:hover {
+            background: ${shade(0.6, 'green')}
+        }
     }
 `;
 
@@ -180,16 +302,16 @@ export const Cart = styled.div`
             margin-right: 7px;
         }
 
-        .fillet_lotomania {
-            width: 0.9rem;
-            height: 100%;
+        .fillet_quina {
+            width: 0.4rem;
+            height: 80%;
             border-top-left-radius: 10px;
             border-bottom-left-radius: 10px;
             background: orange;
             margin-right: 7px;
         }
 
-        .div-numbers-game_lotomania {
+        .div-numbers-game_quina {
             p {
                 font-family: Arial, Helvetica, sans-serif;
                 font-size: 12px;
@@ -201,7 +323,7 @@ export const Cart = styled.div`
                     color: orange
                 }
 
-                .name-game-lotomania {
+                .name-game-quina {
                     color: orange
                 }
         }
@@ -259,9 +381,40 @@ export const Cart = styled.div`
     }
 
     .div-btn-save {
+        .style-btn-save-active {
+            animation: pulse 0.2s;
+            animation-direction: alternate;
+            -webkit-animation-name: pulse;
+            animation-name: pulse;
+        }
+
+        @-webkit-keyframes pulse {
+            0% {
+                -webkit-transform: scale(1);
+                -webkit-filter: brightness(100%);
+            }
+            100% {
+                -webkit-transform: scale(1.1);
+                -webkit-filter: brightness(200%);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                filter: brightness(100%);
+            }
+
+            100% {
+                transform: scale(1.1);
+                filter: brightness(200%);
+            }
+        }
+
         .nav-link-save-games {
             text-decoration: none;
         }
+
         button {
             width: 85%;
             height: 6rem;

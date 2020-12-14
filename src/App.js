@@ -4,7 +4,6 @@ import GlobalStyle from './GlobalStyle';
 
 import { AuthProvider } from './context/AuthContext';
 
-
 const App = () => {
     return (
         <AuthProvider>

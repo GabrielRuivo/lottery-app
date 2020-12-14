@@ -1,9 +1,12 @@
-import React, {useState} from 'react';
-import {useAuth} from '../../context/AuthContext'
-import {AiOutlineShoppingCart, AiOutlineArrowRight} from 'react-icons/ai';
-import {BsTrash} from 'react-icons/bs';
-import {useSelector, useDispatch} from 'react-redux';
-import {NavLink} from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext'
+import { AiOutlineShoppingCart, AiOutlineArrowRight } from 'react-icons/ai';
+import { BsTrash } from 'react-icons/bs';
+import { useSelector, useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
+import api from '../../services/api';
+
+import { Creators as BetsActions } from '../../store/ducks/bets';
 
 import Header from '../../components/Header/index';
 
@@ -15,308 +18,394 @@ import {
     Description, 
     ButtonsVolant, 
     Cart, 
-    DivActionButtons 
-} from './style';
+    DivActionButtons,
+    Animation
+} from './style'; 
 
-// isso aqui vai criar um array com booleans, todos false
-const BUTTONS_LOTOFACIL = Array.from({ length: 25 }).map(() => false);
-const BUTTONS_MEGASENA = Array.from({ length: 60 }).map(() => false);
-const BUTTONS_LOTOMANIA = Array.from({ length: 100 }).map(() => false); 
-
-const Games = (props) => {
-
+const Games = () => {
     const user = useAuth();
     let userName = user.currentUser.displayName   
 
-    const store = useSelector(state => state);
+    const history = useHistory();
     const dispatch = useDispatch();
 
-    const [lotofacilActive, setLotofacilActive] = useState(false);
-    const [megaSenaActive, setmegaSenaActive] = useState(false);
-    const [lotomaniaActive, setlotomaniaActive] = useState(false);
+    const [ infoLotofacil, setInfoLotofacil ] = useState([]);
+    const [ infoMegasena , setInfoMegasena ] = useState([]);
+    const [ infoQuina, setInfoQuina ] = useState([]);
+
+    useEffect(async() => {
+        await api.get('types').then(response => {
+            setInfoLotofacil(response.data[0])
+            setInfoMegasena(response.data[1])
+            setInfoQuina(response.data[2])
+        })
+    }, [])
+
+    // isso aqui vai criar um array com booleans, todos false
+    const BUTTONS_LOTOFACIL = Array.from({ length: 25  }).map(() => false);
+    const BUTTONS_MEGASENA  = Array.from({ length: 60  }).map(() => false);
+    const BUTTONS_QUINA = Array.from({ length: 80 }).map(() => false);
 
     const [listLotofacil, setListLotofacil] = useState(BUTTONS_LOTOFACIL);
-    const [listMegasena, setListMegasena] = useState(BUTTONS_MEGASENA);
-    const [listLotomania, setListLotomania] = useState(BUTTONS_LOTOMANIA);
+    const [listMegasena, setListMegasena  ] = useState(BUTTONS_MEGASENA );
+    const [listQuina, setListQuina] = useState(BUTTONS_QUINA);
 
-    const [buttonAddToCartActive, setButtonAddToCartActive] = useState(false);
+    const [lotofacilActive, setLotofacilActive] = useState(true);
+    const [megaSenaActive, setmegaSenaActive]   = useState(false);
+    const [quinaActive, setQuinaActive] = useState(false);
 
-    const [betsLotofacil, setBetsLotofacil] = useState([]);
     const [betsSavesLotofacil, setBetsSavesLotofacil] = useState([]);
-
-    const [betsMegasena, setBetsMegasena] = useState([]);
     const [betsSavesMegasena, setBetsSavesMegasena] = useState([]);
+    const [betsSavesQuina, setBetsSavesQuina] = useState([]);
 
-    const [betsLotomania, setBetsLotomania] = useState([]);
-    const [betsSavesLotomania, setBetsSavesLotomania] = useState([]);
+    const [ priceCart, setPriceCart ] = useState({
+        total_price: 0
+    });
 
-    let newBetsSavesLotofacil = [...new Set(betsSavesLotofacil.flat(Infinity))]
-    let newBetsSavesMegasena = [...new Set(betsSavesMegasena.flat(Infinity))]
-    let newBetsSavesLotomania = [...new Set(betsSavesLotomania.flat(Infinity))]
+    const [ cartLotofacil, setCartLotofacil ] = useState([]);
+    const [ cartMegasena, setCartMegasena   ] = useState([]);
+    const [ cartQuina, setCartQuina ] = useState([]);
+
+    const [buttonSaveActive, setButtonSaveActive] = useState(true);
+
     
     function activeGameSelected(game) {
         if(game === 'lotofacil') {
             setLotofacilActive(true);
             setmegaSenaActive(false)
-            setlotomaniaActive(false)
+            setQuinaActive(false)
         }
         
         if(game === 'megasena') {
             setLotofacilActive(false);
             setmegaSenaActive(true)
-            setlotomaniaActive(false)
+            setQuinaActive(false)
         }
 
-        if(game === 'lotomania') {
+        if(game === 'quina') {
             setLotofacilActive(false);
             setmegaSenaActive(false)
-            setlotomaniaActive(true)
+            setQuinaActive(true)
         }
+    }
+
+    function getBetsLotofacil() {
+        return listLotofacil.reduce((buttons, isBtnSelected, index) => {
+            if (isBtnSelected) {
+                return [...buttons, index + 1]
+            }
+            return buttons;
+        }, [])
+    }
+
+    function getBetsMegasena() {
+        return listMegasena.reduce((buttons, isBtnSelected, index) => {
+            if (isBtnSelected) {
+                return [...buttons, index + 1]
+            }
+            return buttons;
+        }, [])
+    }
+
+    function getBetsQuina() {
+        return listQuina.reduce((buttons, isBtnSelected, index) => {
+            if (isBtnSelected) {
+                return [...buttons, index + 1]
+            }
+            return buttons;
+        }, [])
     }
 
     function toggleButtonStateLotofacil(buttonIndex) {
-        if(betsLotofacil.length < 20) {
-            
-            setListLotofacil((oldList) => {
-                const newList = oldList.map((isBtnSelected, index) => {
-                    const shouldToggleBtnState = index === buttonIndex;
+        const canToggleBtn = betsLotofacil.length <= 14;
+
+        setListLotofacil((oldList) => {
+            const newList = oldList.map((isBtnSelected, index) => {
+                const shouldToggleBtnState = index === buttonIndex;
+                if(canToggleBtn) {
                     return shouldToggleBtnState === true ? !isBtnSelected : isBtnSelected;
-                });
-                return newList;
-            });
-
-            let buttonsClicked = listLotofacil.reduce((buttons, isBtnSelected, index) => {
-                if (isBtnSelected) {
-                    return [...buttons, index + 1];
                 }
-                return buttons;
-            }, [])
-
-            betsLotofacil.push(buttonsClicked.sort((a,b) => a - b ))
-            betsSavesLotofacil.push(buttonsClicked.sort((a,b) => a - b ))
-           
-            if(betsLotofacil.length >= 15) {
-                setButtonAddToCartActive(true)
-            }
-        } 
+                return isBtnSelected && shouldToggleBtnState ? false : isBtnSelected;
+            });
+            return newList;
+        });
     }
 
     function toggleButtonStateMegasena(buttonIndex) {
-        if(betsMegasena.length < 15) {
-            
-            setListMegasena((oldList) => {
-                const newList = oldList.map((isBtnSelected, index) => {
-                    const shouldToggleBtnState = index === buttonIndex;
+        const canToggleBtn = betsMegasena.length <= 5;
+        
+        setListMegasena((oldList) => {
+            const newList = oldList.map((isBtnSelected, index) => {
+                const shouldToggleBtnState = index === buttonIndex;
+                if(canToggleBtn) {
                     return shouldToggleBtnState === true ? !isBtnSelected : isBtnSelected;
-                });
-                return newList;
-            });
-
-            let buttonsClicked = listMegasena.reduce((buttons, isBtnSelected, index) => {
-                if (isBtnSelected) {
-                    return [...buttons, index + 1];
                 }
-                return buttons;
-            }, [])
-
-            betsMegasena.push(buttonsClicked.sort((a,b) => a - b ))
-            betsSavesMegasena.push(buttonsClicked.sort((a,b) => a - b ))
-           
-            if(betsMegasena.length >= 15) {
-                setButtonAddToCartActive(true)
-            }
-        } 
+                return isBtnSelected && shouldToggleBtnState ? false : isBtnSelected;
+            });
+            return newList;
+        });
     }
 
-    function toggleButtonStateLotomania(buttonIndex) {
-        if(betsLotomania.length < 50) {
-            
-            setListLotomania((oldList) => {
-                const newList = oldList.map((isBtnSelected, index) => {
-                    const shouldToggleBtnState = index === buttonIndex;
+    function toggleButtonStateQuina(buttonIndex) {
+        const canToggleBtn = betsQuina.length <= 4;
+        
+        setListQuina((oldList) => {
+            const newList = oldList.map((isBtnSelected, index) => {
+                const shouldToggleBtnState = index === buttonIndex;
+                if(canToggleBtn) {
                     return shouldToggleBtnState === true ? !isBtnSelected : isBtnSelected;
-                });
-                return newList;
-            });
-
-            let buttonsClicked = listLotomania.reduce((buttons, isBtnSelected, index) => {
-                if (isBtnSelected) {
-                    return [...buttons, index + 1];
                 }
-                return buttons;
-            }, [])
-
-            betsLotomania.push(buttonsClicked.sort((a,b) => a - b ))
-            betsSavesLotomania.push(buttonsClicked.sort((a,b) => a - b ))
-           
-            if(betsLotomania.length >= 50) {
-                setButtonAddToCartActive(true)
-            }
-        } 
+                return isBtnSelected && shouldToggleBtnState ? false : isBtnSelected;
+            });
+            return newList;
+        });
     }
-
 
     function handleClearGameLotofacil() {
-        betsLotofacil.splice(0);
-        betsSavesLotofacil.splice(0);
-        setListLotofacil(listLotofacil.map(item => {
-            return item === true ? false : false;
-        }))
+        setListLotofacil(listLotofacil.map(() => false))
     }
 
     function handleClearGameMegasena() {
-        betsMegasena.splice(0);
-        betsSavesMegasena.splice(0);
-        setListMegasena(listMegasena.map(item => {
-            return item === true ? false : false;
-        }))
+        setListMegasena(listMegasena.map(() => false))
     }
 
-    function handleClearGameLotomania() {
-        betsLotomania.splice(0);
-        betsSavesLotomania.splice(0);
-        setListLotomania(listLotomania.map(item => {
-            return item === true ? false : false;
-        }))
+    function handleClearGameQuina() {
+        setListQuina(listQuina.map(() => false))
     }
 
     function handleCompleteGameLotofacil() {
+        function qtdTrue(value) { return value === true; }
+        let filtered = listLotofacil.filter(qtdTrue);
+        console.log('filtered true:', filtered.length)
+
+        let qtdToAdd =  15 - filtered.length
+        console.log('qtd to add:', qtdToAdd)
         if(betsLotofacil.length < 15) {
+
             let randonBets = [];
-            while(randonBets.length < 15) {
-                let randomBets = Math.floor(Math.random() * (25 - 1)) + 1;
+            while(randonBets.length < qtdToAdd) {
+                let randomBets = Math.floor(Math.random() * (infoLotofacil.range - 1)) + 1;
+
                 if(randonBets.indexOf(randomBets) === -1) {
+                    listLotofacil[randomBets - 1] = true
                     randonBets.push(randomBets);
                 }
             }
-
-            if(randonBets.length >= 15) {
-                setButtonAddToCartActive(true)
-            }
-    
-            randonBets.map(item => { return listLotofacil[item - 1] = true } )
-            setBetsLotofacil( betsLotofacil.concat(randonBets.sort((a,b) => a - b )));
-            setBetsSavesLotofacil( betsSavesLotofacil.concat(randonBets.sort((a,b) => a - b )));
-
-        } 
-        else {
-            alert('Jogo já está completo')
+            
+            /* randonBets.map(item => { return listLotofacil[item - 1] = true } ) */
+            setBetsSavesLotofacil((oldList) => [
+                oldList, (randonBets.sort((a,b) => a - b ))
+            ]);  
+        
+            
+        } else {
+            return alert('Jogo já está completo')
         }
-
     } 
-
+    console.log('BETSSAVESLOTOFACIL:', betsSavesLotofacil);
+          
     function handleCompleteGameMegasena() {
-        if(betsMegasena.length < 15) {
+        
+
+        if(betsMegasena.length < 6) {
             let randonBets = [];
-            while(randonBets.length < 15) {
-                let randomBets = Math.floor(Math.random() * (60 - 1)) + 1;
+            while(randonBets.length < 6) {
+                let randomBets = Math.floor(Math.random() * (infoMegasena.range - 1)) + 1;
                 if(randonBets.indexOf(randomBets) === -1) {
                     randonBets.push(randomBets);
                 }
             }
 
-            if(randonBets.length >= 15) {
-                setButtonAddToCartActive(true)
-            }
-    
-            randonBets.map(item => { return listMegasena[item - 1] = true })
-            setBetsMegasena( betsMegasena.concat(randonBets.sort((a,b) => a - b )));
-            setBetsSavesMegasena( betsSavesMegasena.concat(randonBets.sort((a,b) => a - b )));
-
+            randonBets.map(item => { return listMegasena[item - 1] = true } )
+            setBetsSavesMegasena( betsSavesMegasena.concat(randonBets.sort((a,b) => a - b )));            
         } 
         else {
-            alert('Jogo já está completo')
+            return alert('Jogo já está completo')
         }
     } 
 
-    function handleCompleteGameLotomania() {
-        if(betsLotomania.length < 50) {
+    function handleCompleteGameQuina() {
+        if(betsQuina.length < 5) {
             let randonBets = [];
-            while(randonBets.length < 50) {
-                let randomBets = Math.floor(Math.random() * (100 - 1)) + 1;
+            while(randonBets.length < 5) {
+                let randomBets = Math.floor(Math.random() * (infoQuina.range - 1)) + 1;
                 if(randonBets.indexOf(randomBets) === -1) {
                     randonBets.push(randomBets);
                 }
             }
 
-            if(randonBets.length >= 50) {
-                setButtonAddToCartActive(true)
-            }
-    
-            randonBets.map(item => { return listLotomania[item - 1] = true })
-            setBetsLotomania( betsLotomania.concat(randonBets.sort((a,b) => a - b )));
-            setBetsSavesLotomania( betsSavesLotomania.concat(randonBets.sort((a,b) => a - b )));
-
+            randonBets.map(item => { return listQuina[item - 1] = true } )
+            setBetsSavesQuina( betsSavesQuina.concat(randonBets.sort((a,b) => a - b )));            
         } 
         else {
-            alert('Jogo já está completo')
+            return alert('Jogo já está completo')
         }
-
     } 
 
+    useEffect(() => {
+        if(priceCart.total_price >= 30) {
+            return setButtonSaveActive(false);
+        }
+        return setButtonSaveActive(true);
+    }, [
+        handleAddtoCartLotofacil, 
+        handleClearGameMegasena, 
+        handleAddtoCartQuina,
+        handleDeleteBetLotofacil,
+        handleDeleteBetMegasena,
+        handleDeleteBetQuina
+    ])
 
-    function handleAddtoCart() {
-        dispatch({type: 'ADD_TO_CART_LOTOFACIL', payload: newBetsSavesLotofacil, show: true, price: store.price_lotofacil, date: new Date().toLocaleDateString()});
+    function handleAddtoCartLotofacil() {
+        
+        setCartLotofacil((oldList) => [
+            ...oldList, betsLotofacil
+        ]);
+
+        setPriceCart({
+            ...priceCart,
+            total_price: priceCart.total_price + infoLotofacil.price,
+        });
+
         handleClearGameLotofacil();
-        setButtonAddToCartActive(false);
     }
 
     function handleAddtoCartMegasena() {
-        dispatch({type: 'ADD_TO_CART_MEGASENA', payload_megasena: newBetsSavesMegasena, show: true, price: store.price_megasena, date: new Date().toLocaleDateString()});
+
+        setCartMegasena((oldList) => [
+            ...oldList, betsMegasena
+        ]);
+
+        setPriceCart({
+            ...priceCart,
+            total_price: priceCart.total_price + infoMegasena.price,
+        });
+
         handleClearGameMegasena();
-        setButtonAddToCartActive(false);
     }
 
-    function handleAddtoCartLotomania() {
-        dispatch({type: 'ADD_TO_CART_LOTOMANIA', payload_lotomania: newBetsSavesLotomania, show: true, price: store.price_lotomania, date: new Date().toLocaleDateString()});
-        handleClearGameLotomania();
-        setButtonAddToCartActive(false);
+    function handleAddtoCartQuina() {
+
+        setCartQuina((oldList) => [
+            ...oldList, betsQuina
+        ]);
+
+        setPriceCart({
+            ...priceCart,
+            total_price: priceCart.total_price + infoQuina.price,
+        });
+
+        handleClearGameQuina();
     }
 
-    function handleDeleteBetLotofacil(index) {
-        dispatch({type: 'DELETE_BET_LOTOFACIL_TO_CART', index: index })
+    function handleDeleteBetLotofacil(index1) {
+        priceCart.total_price < 30 && setButtonSaveActive(true);
+
+        setPriceCart({
+            ...priceCart,
+            total_price: priceCart.total_price - infoLotofacil.price,
+        });
+
+        let newData = cartLotofacil.filter((item, index) => index !== index1)
+        setCartLotofacil(newData);
+
     }
 
-    function handleDeleteBetMegasena(index) {
-        dispatch({type: 'DELETE_BET_MEGASENA_TO_CART', index: index })
+    function handleDeleteBetMegasena(index1) {
+        priceCart.total_price < 30 && setButtonSaveActive(true);
+        setPriceCart({
+            ...priceCart,
+            total_price: priceCart.total_price - infoMegasena.price,
+        });
+
+        let newData = cartMegasena.filter((item, index) => index !== index1)
+        setCartMegasena(newData);
     }
 
-    function handleDeleteBetLotomania(index) {
-        dispatch({type: 'DELETE_BET_LOTOMANIA_TO_CART', index: index })
+    function handleDeleteBetQuina(index1) {
+        priceCart.total_price < 30 && setButtonSaveActive(true);
+        setPriceCart({
+            ...priceCart,
+            total_price: priceCart.total_price - infoQuina.price,
+        });
+
+        let newData = cartQuina.filter((item, index) => index !== index1)
+        setCartQuina(newData);
     }
+
+    useEffect(() => {
+        if(cartLotofacil.length > 0 || cartMegasena.length > 0 || cartQuina.length > 0) {
+            setButtonSaveActive(false)
+        } else {
+            setButtonSaveActive(true)
+        }
+    }, [cartLotofacil, cartMegasena, cartQuina])
+    
 
     function handleSaveBets() {
-        dispatch ({
-            type: 'SAVE_BETS', 
-            payload_lotofacil: newBetsSavesLotofacil, 
-            payload_megasena: newBetsSavesMegasena,
-            payload_lotomania: newBetsSavesLotomania,
-            date: new Date().toLocaleDateString(),
-        })
-
-        handleClearGameLotomania();
-        handleClearGameMegasena();
-        handleClearGameLotofacil();
+        if(priceCart.total_price >= 30) {
+            dispatch(BetsActions.saveBets(
+                cartLotofacil, 
+                cartMegasena, 
+                cartQuina, 
+                new Date().toLocaleDateString(),
+            ))
+    
+            alert('bets saved successfully!');
+    
+            setCartLotofacil([]);
+            setCartMegasena([]);
+            setCartQuina([]);
+            setPriceCart({...priceCart, total_price: 0})
+            handleClearGameQuina();
+            handleClearGameMegasena();
+            handleClearGameLotofacil();
+    
+            history.push('/history-Bets')
+        } else {
+            return alert(`${userName}, você precisa fazer no mínimo R$30,00, de apostas !`)
+        }   
     }
 
-    
+    const betsLotofacil = getBetsLotofacil();
+    const isAddToCartBtnLotofacilDisabled = betsLotofacil.length <= 14 || betsLotofacil.length >= 16;
+
+    const betsMegasena = getBetsMegasena();
+    const isAddToCartBtnMegasenaDisabled = betsMegasena.length <= 5 || betsMegasena.length >= 7;
+
+    const betsQuina = getBetsQuina();
+    const isAddToCartBtnQuinaDisabled = betsQuina.length <= 4 || betsQuina.length >= 6;
+    /* console.log({betsLotofacil}) */
+
     return(
         <React.Fragment>
-            <Header historyBets="Home" navLink1={userName} navLink2="Log out" />
+            <Header historyBets="Home" navLink1={userName} navLink2="Sair" />
             <Container >
+                <Animation>
                 <Main>
 
-                <Title><strong>NEW BET</strong> 
-                    {lotofacilActive ? ' FOR LOTOFÁCIL' : ''}
-                    {megaSenaActive  ? ' FOR MEGA-SENA' : ''}
-                    {lotomaniaActive ? ' FOR LOTOMANIA' : ''}
+                <Title><strong>NOVA APOSTA </strong> 
+                    {lotofacilActive ? ' PARA LOTOFÁCIL' : ''}
+                    {megaSenaActive  ? ' PARA MEGA-SENA' : ''}
+                    {quinaActive ? ' PARA QUINA' : ''}
                 </Title>
 
                 <ChooseGame>
-                    <p>Choose a game</p>
-                    <button onClick={() => activeGameSelected('lotofacil')} className="btn-lotofacil" >Lotofacil</button>
-                    <button onClick={() => activeGameSelected('megasena')} className="btn-mega-sena" >Mega-Sena</button>
-                    <button onClick={() => activeGameSelected('lotomania')} className="btn-lotomania" >Lotomania</button>
+                    <p>Escolha um jogo</p>
+                    <button 
+                        onClick={() => activeGameSelected('lotofacil')} 
+                        className={lotofacilActive ? "btn-lotofacil-active" : "btn-lotofacil"}>Lotofácil
+                    </button>
+
+                    <button 
+                        onClick={() => activeGameSelected('megasena')} 
+                        className={megaSenaActive ? "btn-megasena-active" : "btn-megasena"}>MegaSena
+                    </button>
+
+                    <button 
+                        onClick={() => activeGameSelected('quina')} 
+                        className={quinaActive ? "btn-quina-active" : "btn-quina"} >Quina
+                    </button>
                 </ChooseGame>
 
 
@@ -325,12 +414,8 @@ const Games = (props) => {
                     ? 
                     <React.Fragment>
                         <Description>
-                            <p><strong>Fill your bet (Lotofácil)</strong></p>
-                            <p>
-                                You dial between 15 and 20 numbers, among the 25 available on the wheel, 
-                                and you get a premium if you hit 11, 12, 13, 14 or 15 numbers. 
-                                You can also let the system choose the numbers for you through of button complete game
-                            </p>
+                            <p><strong>Faça sua aposta ({ infoLotofacil.type })</strong></p>
+                            <p>{ infoLotofacil.description }</p>
                         </Description>
 
                         <ButtonsVolant>                            
@@ -340,7 +425,7 @@ const Games = (props) => {
                                     key={buttonIndex}
                                     style={{
                                         margin: "0.5rem",
-                                        backgroundColor: isBtnSelected ? "purple" : ""
+                                        backgroundColor: isBtnSelected ?  `${infoLotofacil.color}` : ""
                                     }}
                                     onClick={() => toggleButtonStateLotofacil(buttonIndex)}
                                 >
@@ -356,15 +441,18 @@ const Games = (props) => {
                                 className="btn-complete-game" 
                                 onClick={handleCompleteGameLotofacil}
                             >
-                                Complete game
+                                Completar jogo
                             </button>
-                            <button className="btn-clear-game" onClick={handleClearGameLotofacil} >Clear game</button>
+                            <button className="btn-clear-game" onClick={handleClearGameLotofacil} >Limpar jogo</button>
                             <button 
-                                style={{background: buttonAddToCartActive ? 'green' : 'gray'}}
+                                style={{
+                                    background: isAddToCartBtnLotofacilDisabled ? 'gray' : 'green',
+                                    borderColor: isAddToCartBtnLotofacilDisabled ? 'gray' : 'green',
+                                }}
                                 className="btn-add-to-cart" 
-                                onClick={handleAddtoCart} 
-                                disabled={!buttonAddToCartActive}>
-                            <AiOutlineShoppingCart/>Add to cart</button>
+                                onClick={handleAddtoCartLotofacil} 
+                                disabled={isAddToCartBtnLotofacilDisabled}>
+                            <AiOutlineShoppingCart/>Adcionar ao carrinho</button>
 
                         </DivActionButtons>
                     </React.Fragment>
@@ -375,12 +463,8 @@ const Games = (props) => {
                     megaSenaActive ? 
                     <React.Fragment>
                         <Description>
-                            <p><strong>Fill your bet (Mega-Sena)</strong></p>
-                            <p>
-                                To play in the Mega-Sena, the bettor must choose at 
-                                least six numbers, between 1 and 60. It is allowed to 
-                                choose up to 15 tens in the same card ...
-                            </p>
+                            <p><strong>Faça sua aposta ({infoMegasena.type})</strong></p>
+                            <p>{infoMegasena.description}</p>
                         </Description>
                         <ButtonsVolant>
                             {listMegasena.map((isBtnSelected, buttonIndex) => {
@@ -389,7 +473,7 @@ const Games = (props) => {
                                         key={buttonIndex}
                                         style={{
                                             margin: "0.5rem",
-                                            backgroundColor: isBtnSelected ? "green" : ""
+                                            backgroundColor: isBtnSelected ? `${infoMegasena.color}` : ""
                                         }}
                                         onClick={() => toggleButtonStateMegasena(buttonIndex)}
                                     >
@@ -404,24 +488,27 @@ const Games = (props) => {
                                 className="btn-complete-game" 
                                 onClick={handleCompleteGameMegasena}
                             >
-                                Complete game
+                                Completar jogo
                             </button>
 
                             <button 
                                 onClick={handleClearGameMegasena}
                                 className="btn-clear-game" 
                             >
-                                Clear game
+                                Limpar jogo
                             </button>
 
                             <button 
                                 className="btn-add-to-cart" 
                                 onClick={handleAddtoCartMegasena}
-                                style={{background: buttonAddToCartActive ? 'green' : 'gray'}}
-                                disabled={!buttonAddToCartActive}
+                                style={{
+                                    background: isAddToCartBtnMegasenaDisabled ? 'gray' : 'green',
+                                    borderColor: isAddToCartBtnMegasenaDisabled ? 'gray' : 'green',
+                                }}
+                                disabled={isAddToCartBtnMegasenaDisabled}
                             >
                                 <AiOutlineShoppingCart/>
-                                Add to cart
+                                Adcionar ao carrinho
                             </button>
 
                         </DivActionButtons>
@@ -430,28 +517,25 @@ const Games = (props) => {
                 }
 
                 { 
-                    lotomaniaActive ? 
+                    quinaActive ? 
                     <React.Fragment>
                         <Description>
-                            <p><strong>Fill your bet (Lotomania)</strong></p>
-                            <p>
-                                Lotomania is easy to play and win: just choose 50 numbers 
-                                and then compete for prizes for 20, 19, 18, 17, 16, 15 or no numbers.
-                            </p>
+                            <p><strong>Faça sua aposta ({infoQuina.type})</strong></p>
+                            <p>{infoQuina.description}</p>
                         </Description>
                         <ButtonsVolant>
-                        {listLotomania.map((isBtnSelected, buttonIndex) => {
+                        {listQuina.map((isBtnSelected, buttonIndex) => {
                             return (
                                 <button
                                     key={buttonIndex}
                                     style={{
                                         margin: "0.5rem",
-                                        backgroundColor: isBtnSelected ? "orange" : "",
+                                        backgroundColor: isBtnSelected ? `${infoQuina.color}` : "",
                                         width: '50px',
                                         height: '50px',
                                         fontSize: '15px'
                                     }}
-                                    onClick={() => toggleButtonStateLotomania(buttonIndex)}
+                                    onClick={() => toggleButtonStateQuina(buttonIndex)}
                                 >
                                     {buttonIndex + 1}
                                 </button>
@@ -462,26 +546,29 @@ const Games = (props) => {
                         <DivActionButtons>
                         <button 
                                 className="btn-complete-game" 
-                                onClick={handleCompleteGameLotomania}
+                                onClick={handleCompleteGameQuina}
                             >
-                                Complete game
+                                Completar jogo
                             </button>
 
                             <button 
-                                onClick={handleClearGameLotomania}
+                                onClick={handleClearGameQuina}
                                 className="btn-clear-game" 
                             >
-                                Clear game
+                                Limpar jogo
                             </button>
 
                             <button 
                                 className="btn-add-to-cart" 
-                                onClick={handleAddtoCartLotomania}
-                                style={{background: buttonAddToCartActive ? 'green' : 'gray'}}
-                                disabled={!buttonAddToCartActive}
+                                onClick={handleAddtoCartQuina}
+                                style={{
+                                    background: isAddToCartBtnQuinaDisabled ? 'gray' : 'green',
+                                    borderColor: isAddToCartBtnQuinaDisabled ? 'gray' : 'green',
+                                }}
+                                disabled={isAddToCartBtnQuinaDisabled}
                             >
                                 <AiOutlineShoppingCart/>
-                                Add to cart
+                                Adcionar ao carrinho
                             </button>
                         </DivActionButtons>
                     </React.Fragment>
@@ -489,15 +576,14 @@ const Games = (props) => {
                 }
 
                 </Main>
-
+                </Animation> 
                 <Cart>
-                    
+                    <Animation> 
                     <div className="div-box-bets" >
-                        <h2>CART</h2>
+                        <h2>CARRINHO</h2>
 
-                            { store.show ?
                             <div className="div-only-bets" >
-                                {store.data.map((item , index) => (
+                                {cartLotofacil.map((item , index) => (
                                     <div key={index} className="div-box-bet" >
                                         <div 
                                             className="icon-trash"
@@ -510,14 +596,12 @@ const Games = (props) => {
                                                     {item.join(", ")}
                                                 </strong>                           
                                             </p>
-                                            <p><strong className="name-game" >Lotofácil </strong> R$ 2,50</p>
+                                            <p><strong className="name-game" >Lotofácil </strong> R$ {infoLotofacil.price.toFixed(2)}</p>
                                         </div>
                                     </div>
                                 ))}
 
-
-
-                                {store.data_megasena.map((item , index) => (
+                                {cartMegasena.map((item , index) => (
                                     <div key={index} className="div-box-bet" >
                                         <div 
                                             className="icon-trash"
@@ -530,47 +614,41 @@ const Games = (props) => {
                                                     {item.join(", ")}
                                                 </strong>                           
                                             </p>
-                                            <p><strong className="name-game-megasena" >Megasena </strong> R$ 4,50</p>
+                                            <p><strong className="name-game-megasena" >Megasena </strong> R$ {infoMegasena.price.toFixed(2)}</p>
                                         </div>
                                     </div>
                                 ))}
 
-
-
-                                {store.data_lotomania.map((item , index) => (
+                                {cartQuina.map((item , index) => (
                                     <div key={index} className="div-box-bet" >
                                         <div 
                                             className="icon-trash"
-                                            onClick={() => handleDeleteBetLotomania(index)}  
+                                            onClick={() => handleDeleteBetQuina(index)}  
                                         ><BsTrash /></div>
-                                        <span className="fillet_lotomania" ></span>
-                                        <div className="div-numbers-game_lotomania" >
+                                        <span className="fillet_quina" ></span>
+                                        <div className="div-numbers-game_quina" >
                                             <p>
                                                 <strong>
                                                     {item.join(", ")}
                                                 </strong>                           
                                             </p>
-                                            <p><strong className="name-game-lotomania" >Lotomania </strong> R$ 3,50</p>
+                                            <p><strong className="name-game-quina" >Quina </strong> R$ {infoQuina.price.toFixed(2)}</p>
                                         </div>
                                     </div>
                                 ))}
                             </div>
-                            : ''
-                            
-                            }
-
 
                         <div className="div-cart-total" >
-                            <p><strong>CART</strong> TOTAL: R$ {(store.price_total).toFixed(2)}</p>
+                            <p><strong>Carrinho</strong> TOTAL: R$ {(priceCart.total_price).toFixed(2)}</p>
                         </div>
                     </div>
 
                     <div className="div-btn-save" >
-                        <NavLink className="nav-link-save-games" to="/historyBets" ><button onClick={handleSaveBets} >Save <AiOutlineArrowRight/></button></NavLink>
+                        <button className={!buttonSaveActive && 'style-btn-save-active'} style={{color: buttonSaveActive ? 'gray' : 'green'}} disabled={buttonSaveActive} onClick={handleSaveBets} >Salvar <AiOutlineArrowRight/></button>
                     </div>
-                    
+                    </Animation> 
                 </Cart>
-
+                                        
             </Container>
         </React.Fragment>
     );

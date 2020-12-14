@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://lottery-7c083.firebaseio.com/'
+  baseURL: 'http://localhost:3333'
 })
 
 export default api;
