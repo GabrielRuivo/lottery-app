@@ -256,7 +256,21 @@ export const DivActionButtons = styled.div`
 
 export const Cart = styled.div`
 
+    .icon-trash {
+        max-width: 100%;
+        -moz-transition: all 0.3s;
+        -webkit-transition: all 0.3s;
+        transition: all 0.3s;
+
+        &:hover  {
+            -moz-transform: scale(1.1);
+            -webkit-transform: scale(1.1);
+            transform: scale(1.1);
+        }
+    }
+
     .div-box-bets {
+        position: relative;
         height: 20rem;
         overflow: auto;
         padding: 2rem 1rem;
@@ -270,7 +284,19 @@ export const Cart = styled.div`
         border: 1px solid #ccc;
         background: #fff;
         display: flex;
+       /*  align-items: center;
+        justify-content: center; */
         flex-direction: column;
+
+        .empty-cart {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 15px;
+            color: rgba(0,0,0, 0.3);
+            font-style: italic;
+            position: absolute;
+            margin-top: 35%;
+            margin-left: 30%;
+        }
 
         .div-box-bet {
             display: flex;

@@ -1,4 +1,6 @@
 import React, { useState, useRef } from 'react';
+import { useHistory } from 'react-router';
+import { toast } from 'react-toastify';
 import { useAuth } from '../../context/AuthContext';
 import { AiOutlineArrowRight, AiOutlineArrowLeft } from 'react-icons/ai';
 import { Container, AnimationLogo } from './style';
@@ -7,7 +9,7 @@ import Logo from '../../components/Logo/Logo.jsx';
 import Form from '../../components/Form/Form';
 
 const ForgetPassword = () => {
-
+   const history = useHistory();
    const [ error, setError ] = useState()
    const [ message, setMessage ] = useState('')
 
@@ -22,9 +24,12 @@ const ForgetPassword = () => {
         setError('')
 
         await resetPassword(emailRef.current.value)
-        setMessage('Email sent successfully ! check your inbox')
+         toast.success('Email enviado com sucesso ! check seu inbox')
+         setTimeout(() => {
+            history.push('/login');
+         }, 5000)
       } catch(err) {
-         setError('Email not exist ')
+         toast.error('Email não existe ! ')
       }
 
    }

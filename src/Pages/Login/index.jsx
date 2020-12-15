@@ -1,4 +1,5 @@
 import React, {useState, useRef} from 'react';
+import {toast} from 'react-toastify';
 /* import { useHistory } from 'react-router-dom'; */
 import { useAuth } from '../../context/AuthContext';
 
@@ -31,7 +32,7 @@ const Login = () => {
          await login(emailRef.current.value, passwordRef.current.value)
         /*  history.push("/history-bets") */
       } catch(err) {
-         setError('Email or password invalid')
+         toast.error('Email or password invalid')
       }
       setLoading(false)
 

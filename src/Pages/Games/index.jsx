@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { useAuth } from '../../context/AuthContext'
 import { AiOutlineShoppingCart, AiOutlineArrowRight } from 'react-icons/ai';
 import { BsTrash } from 'react-icons/bs';
@@ -68,7 +69,7 @@ const Games = () => {
 
     const [buttonSaveActive, setButtonSaveActive] = useState(true);
 
-    
+
     function activeGameSelected(game) {
         if(game === 'lotofacil') {
             setLotofacilActive(true);
@@ -176,10 +177,8 @@ const Games = () => {
     function handleCompleteGameLotofacil() {
         function qtdTrue(value) { return value === true; }
         let filtered = listLotofacil.filter(qtdTrue);
-        console.log('filtered true:', filtered.length)
 
         let qtdToAdd =  15 - filtered.length
-        console.log('qtd to add:', qtdToAdd)
         if(betsLotofacil.length < 15) {
 
             let randonBets = [];
@@ -187,58 +186,68 @@ const Games = () => {
                 let randomBets = Math.floor(Math.random() * (infoLotofacil.range - 1)) + 1;
 
                 if(randonBets.indexOf(randomBets) === -1) {
-                    listLotofacil[randomBets - 1] = true
-                    randonBets.push(randomBets);
+                    if(listLotofacil[randomBets - 1] === false) {
+                        listLotofacil[randomBets - 1] = true
+                        randonBets.push(randomBets);
+                    }
                 }
             }
-            
-            /* randonBets.map(item => { return listLotofacil[item - 1] = true } ) */
             setBetsSavesLotofacil((oldList) => [
                 oldList, (randonBets.sort((a,b) => a - b ))
             ]);  
-        
-            
         } else {
-            return alert('Jogo já está completo')
+            return toast.info('O Jogo já está completo !');
         }
     } 
-    console.log('BETSSAVESLOTOFACIL:', betsSavesLotofacil);
           
     function handleCompleteGameMegasena() {
-        
+        function qtdTrue(value) { return value === true; }
+        let filtered = listMegasena.filter(qtdTrue);
+
+        let qtdToAdd = 6 - filtered.length
 
         if(betsMegasena.length < 6) {
             let randonBets = [];
-            while(randonBets.length < 6) {
+            while(randonBets.length < qtdToAdd) {
                 let randomBets = Math.floor(Math.random() * (infoMegasena.range - 1)) + 1;
                 if(randonBets.indexOf(randomBets) === -1) {
-                    randonBets.push(randomBets);
+                    if(listMegasena[randomBets - 1] === false) {
+                        listMegasena[randomBets - 1] = true
+                        randonBets.push(randomBets);
+                    }
                 }
             }
-
-            randonBets.map(item => { return listMegasena[item - 1] = true } )
-            setBetsSavesMegasena( betsSavesMegasena.concat(randonBets.sort((a,b) => a - b )));            
+            setBetsSavesMegasena((oldList) => [
+                oldList, (randonBets.sort((a,b) => a - b ))
+            ]);
         } 
         else {
-            return alert('Jogo já está completo')
+            return toast.info('O Jogo já está completo !');
         }
     } 
 
     function handleCompleteGameQuina() {
+
+        function qtdTrue(value) { return value === true; }
+        let filtered = listQuina.filter(qtdTrue);
+
+        let qtdToAdd =  5 - filtered.length
+
         if(betsQuina.length < 5) {
             let randonBets = [];
-            while(randonBets.length < 5) {
+            while(randonBets.length < qtdToAdd) {
                 let randomBets = Math.floor(Math.random() * (infoQuina.range - 1)) + 1;
-                if(randonBets.indexOf(randomBets) === -1) {
+                if(listQuina[randomBets - 1] === false) {
+                    listQuina[randomBets - 1] = true
                     randonBets.push(randomBets);
                 }
             }
-
-            randonBets.map(item => { return listQuina[item - 1] = true } )
-            setBetsSavesQuina( betsSavesQuina.concat(randonBets.sort((a,b) => a - b )));            
+            setBetsSavesQuina((oldList) => [
+                oldList, (randonBets.sort((a,b) => a - b ))
+            ]);           
         } 
         else {
-            return alert('Jogo já está completo')
+            return toast.info('O Jogo já está completo !');
         }
     } 
 
@@ -351,17 +360,19 @@ const Games = () => {
                 new Date().toLocaleDateString(),
             ))
     
-            alert('bets saved successfully!');
+            toast.success('Apostas salvas com sucesso !');
     
-            setCartLotofacil([]);
-            setCartMegasena([]);
-            setCartQuina([]);
-            setPriceCart({...priceCart, total_price: 0})
-            handleClearGameQuina();
-            handleClearGameMegasena();
-            handleClearGameLotofacil();
-    
-            history.push('/history-Bets')
+            setTimeout(() => {
+                setCartLotofacil([]);
+                setCartMegasena([]);
+                setCartQuina([]);
+                setPriceCart({...priceCart, total_price: 0})
+                handleClearGameQuina();
+                handleClearGameMegasena();
+                handleClearGameLotofacil();
+                history.push('/history-Bets')
+            }, 4000)
+
         } else {
             return alert(`${userName}, você precisa fazer no mínimo R$30,00, de apostas !`)
         }   
@@ -581,14 +592,19 @@ const Games = () => {
                     <Animation> 
                     <div className="div-box-bets" >
                         <h2>CARRINHO</h2>
-
+                            {   
+                                cartLotofacil.length <= 0 
+                                && cartMegasena.length <= 0 
+                                && cartQuina.length <= 0 &&
+                                <p className="empty-cart" >Carrinho vazio</p>
+                            }
                             <div className="div-only-bets" >
                                 {cartLotofacil.map((item , index) => (
                                     <div key={index} className="div-box-bet" >
                                         <div 
                                             className="icon-trash"
                                             onClick={() => handleDeleteBetLotofacil(index)}  
-                                        ><BsTrash /></div>
+                                        ><BsTrash className="icon-trash" /></div>
                                         <span className="fillet" ></span>
                                         <div className="div-numbers-game" >
                                             <p>
@@ -606,7 +622,7 @@ const Games = () => {
                                         <div 
                                             className="icon-trash"
                                             onClick={() => handleDeleteBetMegasena(index)}  
-                                        ><BsTrash /></div>
+                                        ><BsTrash className="icon-trash" /></div>
                                         <span className="fillet_megasena" ></span>
                                         <div className="div-numbers-game" >
                                             <p>
@@ -624,7 +640,9 @@ const Games = () => {
                                         <div 
                                             className="icon-trash"
                                             onClick={() => handleDeleteBetQuina(index)}  
-                                        ><BsTrash /></div>
+                                        >
+                                            <BsTrash className="icon-trash" />
+                                        </div>
                                         <span className="fillet_quina" ></span>
                                         <div className="div-numbers-game_quina" >
                                             <p>

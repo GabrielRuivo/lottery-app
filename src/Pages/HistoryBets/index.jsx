@@ -42,7 +42,7 @@ const HistoryBets = () => {
 
   return (  
     <div>
-      <Header navLink1={userName} navLink2="Log out" />
+      <Header navLink1={userName} navLink2="Sair" />
       <Main>
       <Animation>
         <SubHeader>
