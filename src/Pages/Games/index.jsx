@@ -192,9 +192,9 @@ const Games = () => {
                     }
                 }
             }
-            setBetsSavesLotofacil((oldList) => [
-                oldList, (randonBets.sort((a,b) => a - b ))
-            ]);  
+            setBetsSavesLotofacil(
+                ...betsSavesLotofacil, (randonBets.sort((a,b) => a - b ))
+            );  
         } else {
             return toast.info('O Jogo já está completo !');
         }
@@ -217,9 +217,9 @@ const Games = () => {
                     }
                 }
             }
-            setBetsSavesMegasena((oldList) => [
-                oldList, (randonBets.sort((a,b) => a - b ))
-            ]);
+            setBetsSavesMegasena(
+                ...betsSavesMegasena, (randonBets.sort((a,b) => a - b ))
+            );
         } 
         else {
             return toast.info('O Jogo já está completo !');
@@ -242,9 +242,9 @@ const Games = () => {
                     randonBets.push(randomBets);
                 }
             }
-            setBetsSavesQuina((oldList) => [
-                oldList, (randonBets.sort((a,b) => a - b ))
-            ]);           
+            setBetsSavesQuina(
+                ...betsSavesQuina, (randonBets.sort((a,b) => a - b ))
+            );           
         } 
         else {
             return toast.info('O Jogo já está completo !');
