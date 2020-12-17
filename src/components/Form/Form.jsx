@@ -2,7 +2,7 @@ import React from 'react';
 import {NavLink} from 'react-router-dom';
 import {Container, Title} from './Style'
 
-const Logo = props => {
+const Logo = (props) => {
    return (
       <Container>
 

@@ -14,7 +14,9 @@ import Spinner from '../../components/Spinner/Spinner';
 
 const Login = () => {
 
-   const [ error, setError ] = useState()
+   const [ error, setError ] = useState(false)
+   const [ errorPwd, setErrorPwd ] = useState(false)
+   const [ errorEmail, setErrorEmail ] = useState(false)
    const [ loading, setLoading ] = useState(false)
 
    /* const history = useHistory(); */
@@ -25,14 +27,37 @@ const Login = () => {
 
    async function handleSubmit(e) {
       e.preventDefault()
+      
 
       try {
-         setError('')
+         
          setLoading(true)
          await login(emailRef.current.value, passwordRef.current.value)
         /*  history.push("/history-bets") */
       } catch(err) {
-         toast.error('Email or password invalid')
+         
+         if(passwordRef.current.value.length < 6) {
+            setErrorPwd(true)
+            setErrorEmail(false)
+            setError(false)
+         }
+         if(passwordRef.current.value.length >= 6) {
+            setErrorPwd(false)
+         }
+         if(emailRef.current.value.length === 0) {
+            setErrorPwd(false)
+            setErrorEmail(true)
+            setError(false)
+         }
+         if(emailRef.current.value.length === 0 && passwordRef.current.value.length === 0 ) {
+            setErrorPwd(false)
+            setErrorEmail(false)
+            setError(true)
+         }
+
+         if(passwordRef.current.value.length >= 6 && emailRef.current.value.length > 0) {
+            toast.error('E-mail ou senha inválido.')
+         }
       }
       setLoading(false)
 
@@ -68,8 +93,9 @@ const Login = () => {
                {loading ? <Spinner /> : ''}
                   <Input type="email" refs={emailRef} placeholder="Email" required />
                   <Input className="input-no-radius" type="password" refs={passwordRef} placeholder="Password" required />
-               {error && <div className="span-message-error" >{error}</div>}
-               
+               {errorPwd && <div className="span-message-error" >Senha no mínimo 6 dígitos</div>}
+               {errorEmail && <div className="span-message-error" >E-mail é obrigatório</div>}
+               {error && <div className="span-message-error" >E-mail e senha obrigatório</div>}
             </Form>
          </Container>
       );

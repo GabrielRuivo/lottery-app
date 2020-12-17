@@ -5,6 +5,7 @@
   "dependencies": {
     "axios": "^0.21.0",
     "firebase": "^8.1.1",
+    "formik": "^2.2.6",
     "polished": "^4.0.5",
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
@@ -21,7 +22,8 @@
     "redux-thunk": "^2.3.0",
     "reduxsauce": "^1.2.0",
     "seamless-immutable": "^7.1.4",
-    "styled-components": "^5.2.1"
+    "styled-components": "^5.2.1",
+    "yup": "^0.32.8"
   },
   "scripts": {
     "start": "react-scripts start",
