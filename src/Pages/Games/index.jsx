@@ -35,10 +35,11 @@ const Games = () => {
     const [ infoQuina, setInfoQuina ] = useState([]);
 
     useEffect(async() => {
-        await api.get('types').then(response => {
-            setInfoLotofacil(response.data[0])
-            setInfoMegasena(response.data[1])
-            setInfoQuina(response.data[2])
+        await api.get('').then(response => {
+           /*  console.log(response.data.types[0]) */
+            setInfoLotofacil(response.data.types[0])
+            setInfoMegasena(response.data.types[1])
+            setInfoQuina(response.data.types[2])
         })
     }, [])
 
@@ -374,7 +375,7 @@ const Games = () => {
             }, 4000)
 
         } else {
-            return alert(`${userName}, você precisa fazer no mínimo R$30,00, de apostas !`)
+            return toast.warn(`${userName}, você precisa fazer no mínimo R$30,00, de apostas !`)
         }   
     }
 

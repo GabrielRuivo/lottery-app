@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { NavLink } from 'react-router-dom';
 import { AiOutlineArrowRight } from 'react-icons/ai';
@@ -18,7 +18,21 @@ const HistoryBets = () => {
 
   const [lotofacilActive, setLotofacilActive] = useState(true);
   const [megasenaActive, setMegasenaActive]   = useState(true);
-  const [quinaActive, setLotomaniaActive] = useState(true);
+  const [quinaActive, setQuinaActive] = useState(true);
+
+  useEffect(() => {
+    if(store.bets.data_lotofacil_to_save.length <= 0) {
+      setLotofacilActive(false)
+    }
+    
+    if(store.bets.data_megasena_to_save.length <= 0 ) {
+      setMegasenaActive(false)
+    } 
+
+    if(store.bets.data_quina_to_save.length <= 0 ) {
+      setQuinaActive(false)
+    } 
+  }, [])
 
   function handleWithHistoryBets(game) {
     if (game === 'lotofacil') {
@@ -35,7 +49,7 @@ const HistoryBets = () => {
 
     if (game === 'quina') {
       if(store.bets.data_quina_to_save.length > 0 ) {
-        setLotomaniaActive(!quinaActive)
+        setQuinaActive(!quinaActive)
       }
     }
   }
