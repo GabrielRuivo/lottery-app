@@ -4,11 +4,27 @@ import { NavLink } from 'react-router-dom';
 import { AiOutlineArrowRight } from 'react-icons/ai';
 import Header from '../../components/Header/index';
 import { SubHeader, Main, Animation, Games } from './style';
+import api from '../../services/api';
 
 import {useSelector} from 'react-redux';
 
 const HistoryBets = () => {
 
+  const [ infoLotofacil, setInfoLotofacil ] = useState([]);
+  const [ infoMegasena , setInfoMegasena ] = useState([]);
+  const [ infoQuina, setInfoQuina ] = useState([]);
+
+  useEffect(async() => {
+    await api.get('').then(response => {
+      console.log(response.data.types[0])
+      setInfoLotofacil(response.data.types[0])
+      setInfoMegasena(response.data.types[1])
+      setInfoQuina(response.data.types[2])
+    })
+  }, [])
+  console.log(infoLotofacil.color, infoMegasena.color,  infoQuina.color)
+
+  // isso aqui vai criar um array com booleans, todos false
   const user = useAuth();
   console.log(user)
   let userName = user.currentUser.displayName
@@ -59,7 +75,11 @@ const HistoryBets = () => {
       <Header navLink1={userName} navLink2="Sair" />
       <Main>
       <Animation>
-        <SubHeader>
+        <SubHeader 
+          bgLotofacil={infoLotofacil.color} 
+          bgMegasena={infoMegasena.color} 
+          bgQuina={infoQuina.color}  
+        >
 
           <h2>JOGOS RECENTES</h2> 
           <div className="filters" >
@@ -84,7 +104,11 @@ const HistoryBets = () => {
 
           <NavLink className="NavLink-New-Bet" to="/games" >Nova Aposta<AiOutlineArrowRight/></NavLink>
         </SubHeader>
-        <Games>
+        <Games
+          bgLotofacil={infoLotofacil.color} 
+          bgMegasena={infoMegasena.color} 
+          bgQuina={infoQuina.color}  
+        >
           
           {
             store.bets.data_lotofacil_to_save.length <= 0 && 

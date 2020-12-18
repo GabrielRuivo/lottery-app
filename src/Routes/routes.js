@@ -11,8 +11,10 @@ import Games from '../Pages/Games/index.jsx';
 import Spinner from '../components/Spinner/Spinner'
 
 const NotFoundBase = ({ type }) => <Redirect to={type === 'public' ? "/history-bets" : "/login"} />
+const LoadingBase = () => <Redirect to={"/loading"} />
 const NotFoundPublic = () => <NotFoundBase type='public' />
 const NotFoundPrivate = () => <NotFoundBase type='private' />
+const Loading = () => <LoadingBase />
 
 export default function Routes() {
 	const auth = useAuth();
@@ -24,6 +26,7 @@ export default function Routes() {
 					auth.loading && 	
 						<React.Fragment>
 							<Route path="/loading" component={Spinner}/>
+							<Route component={Loading} />
 						</React.Fragment> 
 				}
 

@@ -83,77 +83,83 @@ export const ChooseGame = styled.div`
 
     .btn-lotofacil {
       border: none;
-      border: 2.5px solid purple;
-      color: purple;
+      border: 2.5px solid ${props => `${props.bgLotofacil}`};
+      color: ${props => `${props.bgLotofacil}`};
       transition: 0.5s;
 
       &:hover {
-        background: ${shade(0.3, 'purple')};
+        background: ${shade(0.1, '#7F3992')};
+        border-color: ${shade(0.1, '#7F3992')};
         color: #fff;
       }
 
     }
     
     .btn-lotofacil-active {
-      background: purple;
+      background: ${props => `${props.bgLotofacil}`};
       color: #fff;
       border: none;
-      border: 2.5px solid purple;
+      border: 2.5px solid ${props => `${props.bgLotofacil}`};
       transition: 0.5s;
 
       &:hover {
-        background: ${shade(0.2, 'purple')};
+        background: ${shade(0.1, '#7F3992')};
+        border-color: ${shade(0.1, '#7F3992')};
         color: #fff;
       }
     }
 
     .btn-megasena {
       border: none;
-      border: 2.5px solid green;
+      border: 2.5px solid ${props => `${props.bgMegasena}`};
       background: transparent;
-      color: green;
+      color: ${props => `${props.bgMegasena}`};
       transition: 0.5s;
 
       &:hover {
-        background: ${shade(0.2, 'green')};
+        background: ${shade(0.1, '#01AC66')};
+        border-color: ${shade(0.1, '#01AC66')};
         color: #fff;
       }
     }
 
     .btn-megasena-active {
-      background: green;
+      background: ${props => `${props.bgMegasena}`};
       color: #fff;
       border: none;
-      border: 2.5px solid green;
+      border: 2.5px solid ${props => `${props.bgMegasena}`};
       transition: 0.5s;
 
       &:hover {
-        background: ${shade(0.2, 'green')};
+        background: ${shade(0.1, '#01AC66')};
+        border-color: ${shade(0.1, '#01AC66')};
         color: #fff;
       }
     }
 
     .btn-quina {
       border: none;
-      border: 2.5px solid orange;
-      color: orange;
+      border: 2.5px solid ${props => `${props.bgQuina}`};
+      color: ${props => `${props.bgQuina}`};
       transition: 0.5s;
 
       &:hover {
-        background: ${shade(0.2, 'orange')};
+        background: ${shade(0.1, '#F79C31')};
+        border-color: ${shade(0.1, '#F79C31')};
         color: #fff;
       }
     }
 
     .btn-quina-active {
-      background: orange;
+      background: ${props => `${props.bgQuina}`};
       color: #fff;
       border: none;
-      border: 2.5px solid orange;
+      border: 2.5px solid ${props => `${props.bgQuina}`};
       transition: 0.5s;
 
       &:hover {
-        background: ${shade(0.2, 'orange')};
+        background: ${shade(0.1, '#F79C31')};
+        border-color: ${shade(0.1, '#F79C31')};
         color: #fff;
       }
     }

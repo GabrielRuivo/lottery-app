@@ -36,13 +36,13 @@ const Games = () => {
 
     useEffect(async() => {
         await api.get('').then(response => {
-           /*  console.log(response.data.types[0]) */
+            console.log(response.data.types[0])
             setInfoLotofacil(response.data.types[0])
             setInfoMegasena(response.data.types[1])
             setInfoQuina(response.data.types[2])
         })
     }, [])
-
+console.log(infoLotofacil.color, infoMegasena.color,  infoQuina.color)
     // isso aqui vai criar um array com booleans, todos false
     const BUTTONS_LOTOFACIL = Array.from({ length: 25  }).map(() => false);
     const BUTTONS_MEGASENA  = Array.from({ length: 60  }).map(() => false);
@@ -353,6 +353,9 @@ const Games = () => {
     
 
     function handleSaveBets() {
+        if(priceCart.total_price < 30) {
+            return toast.warn(`${userName}, você precisa fazer no mínimo R$30,00, de apostas !`)
+        }
         if(priceCart.total_price >= 30) {
             dispatch(BetsActions.saveBets(
                 cartLotofacil, 
@@ -360,17 +363,17 @@ const Games = () => {
                 cartQuina, 
                 new Date().toLocaleDateString(),
             ))
+            setCartLotofacil([]);
+            setCartMegasena([]);
+            setCartQuina([]);
+            setPriceCart({...priceCart, total_price: 0})
+            handleClearGameQuina();
+            handleClearGameMegasena();
+            handleClearGameLotofacil();
     
             toast.success('Apostas salvas com sucesso !');
     
             setTimeout(() => {
-                setCartLotofacil([]);
-                setCartMegasena([]);
-                setCartQuina([]);
-                setPriceCart({...priceCart, total_price: 0})
-                handleClearGameQuina();
-                handleClearGameMegasena();
-                handleClearGameLotofacil();
                 history.push('/history-Bets')
             }, 4000)
 
@@ -402,7 +405,11 @@ const Games = () => {
                     {quinaActive ? ' PARA QUINA' : ''}
                 </Title>
 
-                <ChooseGame>
+                <ChooseGame 
+                    bgLotofacil={infoLotofacil.color} 
+                    bgMegasena={infoMegasena.color} 
+                    bgQuina={infoQuina.color} 
+                >
                     <p>Escolha um jogo</p>
                     <button 
                         onClick={() => activeGameSelected('lotofacil')} 
@@ -663,7 +670,7 @@ const Games = () => {
                     </div>
 
                     <div className="div-btn-save" >
-                        <button className={!buttonSaveActive && 'style-btn-save-active'} style={{color: buttonSaveActive ? 'gray' : 'green'}} disabled={buttonSaveActive} onClick={handleSaveBets} >Salvar <AiOutlineArrowRight/></button>
+                        <button className={!buttonSaveActive && 'style-btn-save-active'} style={{color: buttonSaveActive ? 'gray' : 'green'}} /* disabled={buttonSaveActive} */ onClick={handleSaveBets} >Salvar <AiOutlineArrowRight/></button>
                     </div>
                     </Animation> 
                 </Cart>
