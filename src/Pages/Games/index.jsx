@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { useAuth } from '../../context/AuthContext'
+/* import { useAuth } from '../../context/AuthContext' */
 import { AiOutlineShoppingCart, AiOutlineArrowRight } from 'react-icons/ai';
 import { BsTrash } from 'react-icons/bs';
 import { /* useSelector,  */useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import api from '../../services/api';
+import { api, apiAdonis } from '../../services/api';
 
 import { Creators as BetsActions } from '../../store/ducks/bets';
 
@@ -24,32 +24,35 @@ import {
 } from './style'; 
 
 const Games = () => {
-    const user = useAuth();
-    let userName = user.currentUser.displayName   
+
+    const userData = localStorage.getItem('@tokenLottery')
+    const userName = JSON.parse(userData)
+    console.log('Local Storage', userName.userName.username)
 
     const history = useHistory();
     const dispatch = useDispatch();
+
+    const [ gameTypes, setGameTypes ] = useState([])
 
     const [ infoLotofacil, setInfoLotofacil ] = useState([]);
     const [ infoMegasena , setInfoMegasena ] = useState([]);
     const [ infoQuina, setInfoQuina ] = useState([]);
 
-    useEffect(async() => {
-        await api.get('').then(response => {
-            console.log(response.data.types[0])
-            setInfoLotofacil(response.data.types[0])
-            setInfoMegasena(response.data.types[1])
-            setInfoQuina(response.data.types[2])
+    useEffect( async () => {
+        await apiAdonis.get('types').then(response => {
+            console.log('RESPONSE TYPES API ADONIS: ', response.data[0])
+            setInfoLotofacil(response.data[0])
+            setInfoMegasena(response.data[1])
+            setInfoQuina(response.data[2])
         })
-    }, [])
-console.log(infoLotofacil.color, infoMegasena.color,  infoQuina.color)
-    // isso aqui vai criar um array com booleans, todos false
+    },[])
+
     const BUTTONS_LOTOFACIL = Array.from({ length: 25  }).map(() => false);
     const BUTTONS_MEGASENA  = Array.from({ length: 60  }).map(() => false);
     const BUTTONS_QUINA = Array.from({ length: 80 }).map(() => false);
 
     const [listLotofacil, setListLotofacil] = useState(BUTTONS_LOTOFACIL);
-    const [listMegasena, setListMegasena  ] = useState(BUTTONS_MEGASENA );
+    const [listMegasena, setListMegasena] = useState(BUTTONS_MEGASENA );
     const [listQuina, setListQuina] = useState(BUTTONS_QUINA);
 
     const [lotofacilActive, setLotofacilActive] = useState(true);
@@ -60,12 +63,10 @@ console.log(infoLotofacil.color, infoMegasena.color,  infoQuina.color)
     const [betsSavesMegasena, setBetsSavesMegasena] = useState([]);
     const [betsSavesQuina, setBetsSavesQuina] = useState([]);
 
-    const [ priceCart, setPriceCart ] = useState({
-        total_price: 0
-    });
+    const [ priceCart, setPriceCart ] = useState({total_price: 0});
 
     const [ cartLotofacil, setCartLotofacil ] = useState([]);
-    const [ cartMegasena, setCartMegasena   ] = useState([]);
+    const [ cartMegasena, setCartMegasena ] = useState([]);
     const [ cartQuina, setCartQuina ] = useState([]);
 
     const [buttonSaveActive, setButtonSaveActive] = useState(true);
@@ -76,6 +77,8 @@ console.log(infoLotofacil.color, infoMegasena.color,  infoQuina.color)
             setLotofacilActive(true);
             setmegaSenaActive(false)
             setQuinaActive(false)
+/*             console.log('game types: ', gameTypes[0])
+            console.log('TIME LOCALE: ', new Date().toLocaleDateString()) */
         }
         
         if(game === 'megasena') {
@@ -91,6 +94,7 @@ console.log(infoLotofacil.color, infoMegasena.color,  infoQuina.color)
         }
     }
 
+    
     function getBetsLotofacil() {
         return listLotofacil.reduce((buttons, isBtnSelected, index) => {
             if (isBtnSelected) {
@@ -117,6 +121,9 @@ console.log(infoLotofacil.color, infoMegasena.color,  infoQuina.color)
             return buttons;
         }, [])
     }
+
+
+
 
     function toggleButtonStateLotofacil(buttonIndex) {
         const canToggleBtn = betsLotofacil.length <= 14;
@@ -163,6 +170,9 @@ console.log(infoLotofacil.color, infoMegasena.color,  infoQuina.color)
         });
     }
 
+
+
+
     function handleClearGameLotofacil() {
         setListLotofacil(listLotofacil.map(() => false))
     }
@@ -174,6 +184,9 @@ console.log(infoLotofacil.color, infoMegasena.color,  infoQuina.color)
     function handleClearGameQuina() {
         setListQuina(listQuina.map(() => false))
     }
+
+
+
 
     function handleCompleteGameLotofacil() {
         function qtdTrue(value) { return value === true; }
@@ -252,6 +265,9 @@ console.log(infoLotofacil.color, infoMegasena.color,  infoQuina.color)
         }
     } 
 
+
+
+
     useEffect(() => {
         if(priceCart.total_price >= 30) {
             return setButtonSaveActive(false);
@@ -266,15 +282,19 @@ console.log(infoLotofacil.color, infoMegasena.color,  infoQuina.color)
         handleDeleteBetQuina
     ])
 
+
+
+
+
     function handleAddtoCartLotofacil() {
-        
+
         setCartLotofacil((oldList) => [
             ...oldList, betsLotofacil
         ]);
 
         setPriceCart({
             ...priceCart,
-            total_price: priceCart.total_price + infoLotofacil.price,
+            total_price: (+priceCart.total_price) + (+infoLotofacil.price),
         });
 
         handleClearGameLotofacil();
@@ -288,7 +308,7 @@ console.log(infoLotofacil.color, infoMegasena.color,  infoQuina.color)
 
         setPriceCart({
             ...priceCart,
-            total_price: priceCart.total_price + infoMegasena.price,
+            total_price: +priceCart.total_price + +infoMegasena.price,
         });
 
         handleClearGameMegasena();
@@ -302,11 +322,15 @@ console.log(infoLotofacil.color, infoMegasena.color,  infoQuina.color)
 
         setPriceCart({
             ...priceCart,
-            total_price: priceCart.total_price + infoQuina.price,
+            total_price: +priceCart.total_price + +infoQuina.price,
         });
 
         handleClearGameQuina();
     }
+
+
+
+
 
     function handleDeleteBetLotofacil(index1) {
         priceCart.total_price < 30 && setButtonSaveActive(true);
@@ -351,35 +375,69 @@ console.log(infoLotofacil.color, infoMegasena.color,  infoQuina.color)
         }
     }, [cartLotofacil, cartMegasena, cartQuina])
     
+    async function handleSaveBets() {
+        try {
+            
+            if(priceCart.total_price < 30) {
+                return toast.warn(`${userName.userName.username}, você precisa fazer no mínimo R$30,00, de apostas !`)
+            }
 
-    function handleSaveBets() {
-        if(priceCart.total_price < 30) {
-            return toast.warn(`${userName}, você precisa fazer no mínimo R$30,00, de apostas !`)
-        }
-        if(priceCart.total_price >= 30) {
-            dispatch(BetsActions.saveBets(
-                cartLotofacil, 
-                cartMegasena, 
-                cartQuina, 
-                new Date().toLocaleDateString(),
-            ))
-            setCartLotofacil([]);
-            setCartMegasena([]);
-            setCartQuina([]);
-            setPriceCart({...priceCart, total_price: 0})
-            handleClearGameQuina();
-            handleClearGameMegasena();
-            handleClearGameLotofacil();
-    
-            toast.success('Apostas salvas com sucesso !');
-    
-            setTimeout(() => {
-                history.push('/history-Bets')
-            }, 4000)
+            if(priceCart.total_price >= 30) {
+                dispatch(BetsActions.saveBets(
+                    cartLotofacil, 
+                    cartMegasena, 
+                    cartQuina, 
+                    new Date().toLocaleDateString(),
+                ))
 
-        } else {
-            return toast.warn(`${userName}, você precisa fazer no mínimo R$30,00, de apostas !`)
-        }   
+                const loto = cartLotofacil.map(item => {
+                    return {
+                        numbers: item,
+                        game_id: 1,
+                        date: new Date().toLocaleDateString()
+                    }
+                })
+
+                const mega = cartMegasena.map(item => {
+                    return {
+                        numbers: item,
+                        game_id: 2,
+                        date: new Date().toLocaleDateString()
+                    }
+                })
+
+                const quina = cartQuina.map(item => {
+                    return {
+                        numbers: item,
+                        game_id: 3,
+                        date: new Date().toLocaleDateString()
+                    }
+                })
+                
+                await apiAdonis.post('/games', {
+                    data: [...loto,...mega,...quina ],
+                }).then(res => console.log('response:', res.data))
+
+                setCartLotofacil([]);
+                setCartMegasena([]);
+                setCartQuina([]);
+                setPriceCart({...priceCart, total_price: 0})
+                handleClearGameQuina();
+                handleClearGameMegasena();
+                handleClearGameLotofacil();
+                
+                toast.success('Apostas salvas com sucesso !');
+        
+                setTimeout(() => {
+                    history.push('/history-Bets')
+                }, 4000)
+    
+            } else {
+                return toast.warn(`, você precisa fazer no mínimo R$30,00, de apostas !`)
+            } 
+        } catch(err) {
+            return toast.warn(`Erro !`)
+        }  
     }
 
     const betsLotofacil = getBetsLotofacil();
@@ -394,7 +452,7 @@ console.log(infoLotofacil.color, infoMegasena.color,  infoQuina.color)
 
     return(
         <React.Fragment>
-            <Header historyBets="Home" navLink1={userName} navLink2="Sair" />
+            <Header historyBets="Home" navLink1={userName.userName.username} navLink2="Sair" />
             <Container >
                 <Animation>
                 <Main>
@@ -427,13 +485,12 @@ console.log(infoLotofacil.color, infoMegasena.color,  infoQuina.color)
                     </button>
                 </ChooseGame>
 
-
                 {
                     lotofacilActive 
                     ? 
                     <React.Fragment>
                         <Description>
-                            <p><strong>Faça sua aposta ({ infoLotofacil.type })</strong></p>
+                            <p><strong>Faça sua aposta ({infoLotofacil.game_type})</strong></p>
                             <p>{ infoLotofacil.description }</p>
                         </Description>
 
@@ -471,7 +528,7 @@ console.log(infoLotofacil.color, infoMegasena.color,  infoQuina.color)
                                 className="btn-add-to-cart" 
                                 onClick={handleAddtoCartLotofacil} 
                                 disabled={isAddToCartBtnLotofacilDisabled}>
-                            <AiOutlineShoppingCart/>Adcionar ao carrinho</button>
+                            <AiOutlineShoppingCart/>Adicionar ao carrinho</button>
 
                         </DivActionButtons>
                     </React.Fragment>
@@ -482,7 +539,7 @@ console.log(infoLotofacil.color, infoMegasena.color,  infoQuina.color)
                     megaSenaActive ? 
                     <React.Fragment>
                         <Description>
-                            <p><strong>Faça sua aposta ({infoMegasena.type})</strong></p>
+                            <p><strong>Faça sua aposta ({infoMegasena.game_type})</strong></p>
                             <p>{infoMegasena.description}</p>
                         </Description>
                         <ButtonsVolant>
@@ -539,7 +596,7 @@ console.log(infoLotofacil.color, infoMegasena.color,  infoQuina.color)
                     quinaActive ? 
                     <React.Fragment>
                         <Description>
-                            <p><strong>Faça sua aposta ({infoQuina.type})</strong></p>
+                            <p><strong>Faça sua aposta ({infoQuina.game_type})</strong></p>
                             <p>{infoQuina.description}</p>
                         </Description>
                         <ButtonsVolant>
@@ -620,7 +677,7 @@ console.log(infoLotofacil.color, infoMegasena.color,  infoQuina.color)
                                                     {item.join(", ")}
                                                 </strong>                           
                                             </p>
-                                            <p><strong className="name-game" >Lotofácil </strong> R$ {infoLotofacil.price.toFixed(2)}</p>
+                                            <p><strong className="name-game" >Lotofácil </strong> R$ {(+infoLotofacil.price).toFixed(2)}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -638,7 +695,7 @@ console.log(infoLotofacil.color, infoMegasena.color,  infoQuina.color)
                                                     {item.join(", ")}
                                                 </strong>                           
                                             </p>
-                                            <p><strong className="name-game-megasena" >Megasena </strong> R$ {infoMegasena.price.toFixed(2)}</p>
+                                            <p><strong className="name-game-megasena" >Megasena </strong> R$ {(+infoMegasena.price).toFixed(2)}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -658,19 +715,24 @@ console.log(infoLotofacil.color, infoMegasena.color,  infoQuina.color)
                                                     {item.join(", ")}
                                                 </strong>                           
                                             </p>
-                                            <p><strong className="name-game-quina" >Quina </strong> R$ {infoQuina.price.toFixed(2)}</p>
+                                            <p><strong className="name-game-quina" >Quina </strong> R$ {(+infoQuina.price).toFixed(2)}</p>
                                         </div>
                                     </div>
                                 ))}
                             </div>
 
                         <div className="div-cart-total" >
-                            <p><strong>Carrinho</strong> TOTAL: R$ {(priceCart.total_price).toFixed(2)}</p>
+                            <p><strong>Carrinho</strong> TOTAL: R$ {(+priceCart.total_price).toFixed(2)}</p>
                         </div>
                     </div>
 
                     <div className="div-btn-save" >
-                        <button className={!buttonSaveActive && 'style-btn-save-active'} style={{color: buttonSaveActive ? 'gray' : 'green'}} /* disabled={buttonSaveActive} */ onClick={handleSaveBets} >Salvar <AiOutlineArrowRight/></button>
+                        <button 
+                            className={!buttonSaveActive && 'style-btn-save-active'} 
+                            style={{color: buttonSaveActive ? 'gray' : 'green'}}
+                            onClick={handleSaveBets} >
+                                Salvar <AiOutlineArrowRight/>
+                        </button>
                     </div>
                     </Animation> 
                 </Cart>

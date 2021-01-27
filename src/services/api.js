@@ -1,7 +1,16 @@
 import axios from 'axios';
 
-const api = axios.create({
+/* export const api = axios.create({
   baseURL: './server.json'
+}) */
+
+
+
+export const apiAdonis = axios.create({
+  baseURL: 'http://localhost:3333',
+  /* headers: {'Authorization': `Bearer ${auth.token.token}`} */
 })
 
-export default api;
+/* console.log('AUTH: ', JSON.stringify(auth.token.token) ) */
+
+

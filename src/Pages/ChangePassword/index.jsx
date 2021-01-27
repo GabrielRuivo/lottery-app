@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-/* import { useHistory } from 'react-router'; */
+import { useParams, useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
 /* import { useAuth } from '../../context/AuthContext'; */
 import { AiOutlineArrowRight, AiOutlineArrowLeft } from 'react-icons/ai';
@@ -12,13 +12,14 @@ import Spinner from '../../components/Spinner/Spinner';
 
 import { apiAdonis } from '../../services/api';
 
-const ForgetPassword = () => {
-/*    const history = useHistory(); */
+const ChangePassword = () => {
+   let { token } = useParams();
+   const history = useHistory();
    const [ error, setError ] = useState()
    const [ message, setMessage ] = useState('')
    const [ loading, setLoading ] = useState(false)
 
-   const emailRef = useRef()
+   const passwordRef = useRef()
    /* const { resetPassword } = useAuth() */
 
    async function handleSubmit(e) {
@@ -29,16 +30,21 @@ const ForgetPassword = () => {
          setError('')
 
          /* await resetPassword(emailRef.current.value) */
-         await apiAdonis.post('/forgot', {
-            email: emailRef.current.value
+         await apiAdonis.put('/forgot', {
+            token: token,
+            password: passwordRef.current.value
          })
          setLoading(false)
-         emailRef.current.value = '';
-         toast.success('Email enviado com sucesso ! check seu inbox')
+         passwordRef.current.value = '';
+         toast.success('Senha trocado com sucesso !')
+
+         setTimeout(() => {
+            history.push('/login')
+         }, 4000)
 
       } catch(err) {
          setLoading(false)
-         toast.error('Email não existe ! ')
+         toast.error('Algo deu errado !')
       }
 
    }
@@ -48,7 +54,7 @@ const ForgetPassword = () => {
          type="submit"
          className="link-1" 
       >
-         Send Link<AiOutlineArrowRight/>
+         Change <AiOutlineArrowRight/>
       </button> 
    )
 
@@ -61,9 +67,9 @@ const ForgetPassword = () => {
          
          <Form 
             onSubmit={handleSubmit}
-            title="Reset password" 
-            link1="Send link" 
-            link2="Back" 
+            title="Change password" 
+            link1="Change" 
+            link2="Log In" 
             linkLogin={linkLog}
             linkRedirect1="/"
             linkRedirect2="/login"
@@ -71,7 +77,7 @@ const ForgetPassword = () => {
             icon2={<AiOutlineArrowLeft/>}
          >
             {loading && <Spinner />}
-            <Input type="email" refs={emailRef} placeholder="Email"/>
+            <Input type="password" refs={passwordRef} placeholder="Password"/>
             {error && <div className="span-message-error">{error}</div>}
             {message && <div className="span-message-send">{message}</div>}
          </Form>
@@ -79,4 +85,4 @@ const ForgetPassword = () => {
    );
 };
 
-export default ForgetPassword;
+export default ChangePassword;

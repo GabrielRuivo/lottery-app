@@ -1,19 +1,20 @@
-import React from 'react';
-import {useAuth} from '../../context/AuthContext'
+import React, { useContext } from 'react';
+/* import {useAuth} from '../../context/AuthContext' */
+import { AuthContext } from '../../context/AuthContext';
+import { AiOutlineArrowRight } from 'react-icons/ai';
+import { NavLink, useHistory } from 'react-router-dom';
+import { apiAdonis } from '../../services/api';
 
-import {AiOutlineArrowRight} from 'react-icons/ai';
-import {NavLink, useHistory} from 'react-router-dom';
-
-import {useDispatch} from 'react-redux';
-import {DivHeader} from './style';
-
-
+import { useDispatch } from 'react-redux';
+import { DivHeader } from './style';
 
 const Header = (props) => {
 
+   const [token, setToken] = useContext(AuthContext)
+
    const dispatch = useDispatch();
    
-   const { logout } = useAuth()
+   /* const { logout } = useAuth() */
 
 	const history = useHistory();
 
@@ -22,8 +23,14 @@ const Header = (props) => {
       dispatch({type: 'CLEAR_STATE'})
 
 		try {
-			await logout()
-			history.push('/login')
+         /* await logout() */
+         await apiAdonis.get('/logout').then(res => {
+            const response = res.data;
+            console.log(response)
+            setToken(localStorage.removeItem('@tokenLottery'))
+            history.push('/')
+         })
+
 		} catch (error){
 			console.log('Failed to log out')
 		}

@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import { useAuth } from '../../context/AuthContext';
-/* import { useHistory } from 'react-router-dom'; */
+/* import { useAuth } from '../../context/AuthContext'; */
+import { useHistory } from 'react-router-dom';
 import { AiOutlineArrowRight, AiOutlineArrowLeft } from 'react-icons/ai';
 import { Container, AnimationLogo } from './style';
 
@@ -10,6 +10,8 @@ import Logo from '../../components/Logo/Logo.jsx';
 import Form from '../../components/Form/Form';
 
 import Spinner from '../../components/Spinner/Spinner';
+
+import { apiAdonis } from '../../services/api';
 
 export default function Register() {
   /*  const [ error, setError ] = useState(false);
@@ -21,9 +23,9 @@ export default function Register() {
    const nameRef = useRef()
    const emailRef = useRef()
    const passwordRef = useRef()
-   const { onSignUpSubmit } = useAuth()
+   /* const { onSignUpSubmit } = useAuth() */
 
-   /* const history = useHistory(); */
+   const history = useHistory();
 
    function inputFocus() {
       nameRef.current.focus();
@@ -42,12 +44,19 @@ export default function Register() {
          }
       
          setLoading(true)
-         await onSignUpSubmit(nameRef.current.value, emailRef.current.value, passwordRef.current.value)
+         /* await onSignUpSubmit(nameRef.current.value, emailRef.current.value, passwordRef.current.value) */
+         await apiAdonis.post('/users', {
+            username: nameRef.current.value,
+            email: emailRef.current.value,
+            password: passwordRef.current.value
+         }).then(res => {
+            console.log('Response:', res)
+         })
          toast.success('Registrado com sucesso !')
 
-/*          setTimeout(() => {
+         setTimeout(() => {
             history.push("/login")
-         }, 4000); */
+         }, 4000);
          
       } catch(e) {
          console.log('Err', e)

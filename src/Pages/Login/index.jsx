@@ -1,9 +1,10 @@
-import React, {useState, useRef} from 'react';
-import {toast} from 'react-toastify';
-/* import { useHistory } from 'react-router-dom'; */
-import { useAuth } from '../../context/AuthContext';
+import React, {useState, useRef, useContext} from 'react';
+import { toast } from 'react-toastify';
+import { useHistory } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContext';
+import { apiAdonis } from '../../services/api';
 
-import {AiOutlineArrowRight} from 'react-icons/ai';
+import { AiOutlineArrowRight } from 'react-icons/ai';
 
 import {Container, AnimationLogo} from './style';
 import Input from '../../components/Input/Input';
@@ -19,21 +20,31 @@ const Login = () => {
    const [ errorEmail, setErrorEmail ] = useState(false)
    const [ loading, setLoading ] = useState(false)
 
-   /* const history = useHistory(); */
+   const [ token, setToken ] = useContext(AuthContext)
+
+   const history = useHistory();
 
    const emailRef = useRef()
    const passwordRef = useRef()
-   const { login } = useAuth()
+   /* const { login } = useAuth() */
 
    async function handleSubmit(e) {
       e.preventDefault()
       
-
       try {
-         
          setLoading(true)
-         await login(emailRef.current.value, passwordRef.current.value)
-        /*  history.push("/history-bets") */
+
+         /* await login(emailRef.current.value, passwordRef.current.value) */
+         await apiAdonis.post('/login', {
+            email: emailRef.current.value,
+            password: passwordRef.current.value
+         }).then(res => {
+            const response = res.data;
+            localStorage.setItem('@tokenLottery', JSON.stringify(response))
+
+         })
+         setToken(true)
+
       } catch(err) {
          
          if(passwordRef.current.value.length < 6) {

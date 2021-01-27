@@ -38,5 +38,4 @@ export const Creators = {
 			date
 		}
 	}),
-	
 }

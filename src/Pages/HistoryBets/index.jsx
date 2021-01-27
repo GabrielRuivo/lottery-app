@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
+/* import { useAuth } from '../../context/AuthContext'; */
 import { NavLink } from 'react-router-dom';
 import { AiOutlineArrowRight } from 'react-icons/ai';
 import Header from '../../components/Header/index';
 import { SubHeader, Main, Animation, Games } from './style';
-import api from '../../services/api';
+import { /* api */ apiAdonis } from '../../services/api';
 
-import {useSelector} from 'react-redux';
+/* import { useSelector } from 'react-redux'; */
 
 const HistoryBets = () => {
 
@@ -14,65 +14,62 @@ const HistoryBets = () => {
   const [ infoMegasena , setInfoMegasena ] = useState([]);
   const [ infoQuina, setInfoQuina ] = useState([]);
 
-  useEffect(async() => {
-    await api.get('').then(response => {
-      console.log(response.data.types[0])
-      setInfoLotofacil(response.data.types[0])
-      setInfoMegasena(response.data.types[1])
-      setInfoQuina(response.data.types[2])
+  useEffect( async () => {
+    await apiAdonis.get('types').then(response => {
+        console.log('RESPONSE TYPES API ADONIS: ', response.data[0])
+        setInfoLotofacil(response.data[0])
+        setInfoMegasena(response.data[1])
+        setInfoQuina(response.data[2])
     })
-  }, [])
-  console.log(infoLotofacil.color, infoMegasena.color,  infoQuina.color)
+    
+},[])
 
-  // isso aqui vai criar um array com booleans, todos false
-  const user = useAuth();
-  console.log(user)
-  let userName = user.currentUser.displayName
+  const userData = localStorage.getItem('@tokenLottery')
+  const userName = JSON.parse(userData)
+  const user_id = userName.userName.id
 
-  const store = useSelector(state => state)
-  console.log('STORE', store.bets)
+  const storage = localStorage.getItem('@tokenLottery')
+  const auth = JSON.parse(storage)
+
+  if(storage) {
+    apiAdonis.defaults.headers.authorization = `Bearer ${auth.token.token}`
+  }
+  
+  /* const store = useSelector(state => state) */
 
   const [lotofacilActive, setLotofacilActive] = useState(true);
-  const [megasenaActive, setMegasenaActive]   = useState(true);
+  const [megasenaActive, setMegasenaActive] = useState(true);
   const [quinaActive, setQuinaActive] = useState(true);
 
-  useEffect(() => {
-    if(store.bets.data_lotofacil_to_save.length <= 0) {
-      setLotofacilActive(false)
-    }
-    
-    if(store.bets.data_megasena_to_save.length <= 0 ) {
-      setMegasenaActive(false)
-    } 
+  const [ dbInformation, setDbInformation ] = useState([])
 
-    if(store.bets.data_quina_to_save.length <= 0 ) {
-      setQuinaActive(false)
-    } 
+  useEffect(() => {
+    async function handleRequestGames () {
+      await apiAdonis.get(`games?id=${user_id}`).then(res => {
+        console.log('RESPONSE GAMES', res.data)
+        setDbInformation(...dbInformation, res.data)
+      })
+    }
+    handleRequestGames ()
   }, [])
 
   function handleWithHistoryBets(game) {
     if (game === 'lotofacil') {
-      if(store.bets.data_lotofacil_to_save.length > 0 ) {
-        setLotofacilActive(!lotofacilActive)
-      }
+      setLotofacilActive(!lotofacilActive)
     }
 
     if (game === 'megasena') {
-      if(store.bets.data_megasena_to_save.length > 0 ) {
-        setMegasenaActive(!megasenaActive)
-      }
+      setMegasenaActive(!megasenaActive)
     }
 
     if (game === 'quina') {
-      if(store.bets.data_quina_to_save.length > 0 ) {
-        setQuinaActive(!quinaActive)
-      }
+      setQuinaActive(!quinaActive)
     }
   }
 
   return (  
     <div>
-      <Header navLink1={userName} navLink2="Sair" />
+      <Header navLink1={userName.userName.username} navLink2="Sair" />
       <Main>
       <Animation>
         <SubHeader 
@@ -110,85 +107,61 @@ const HistoryBets = () => {
           bgQuina={infoQuina.color}  
         >
           
-          {
-            store.bets.data_lotofacil_to_save.length <= 0 && 
-            store.bets.data_megasena_to_save.length <= 0 && 
-            store.bets.data_quina_to_save.length <= 0 
-            && <p className="message-empty-bets" >
-                Você não tem nenhuma aposta salva, faça a sua agora clicando em nova aposta !
-              </p>
-          }
-          {
-          lotofacilActive ? 
-            <React.Fragment>
-              {
-                store.bets.data_lotofacil_to_save.flat(1).map((item, index) => {
-                  console.log('ITEM LOTOFACIL', item)
-                  if(item.length > 0) {
-                    return (
-                      <div key={index} className="div-lotofacil" >
-                        <span className="column-lotofacil" />
-                        <div className="div-rows-lotofacil">
-                          <p><strong>{item.join(', ')}</strong></p>
-                          <p>{store.bets.date} - (R$ 2,50)</p>
-                          <p><strong className="strong-lotofacil" >Lotofácil</strong></p>
-                        </div>
-                      </div> 
-                    )
-                  }
-                  return ''
-                })
-              }
-            </React.Fragment> : ''
+          { dbInformation.length <= 0 && 
+            <p className="message-empty-bets" >
+              Você não tem nenhuma aposta salva, faça a sua agora clicando em nova aposta !
+            </p>
           }
 
           {
-            megasenaActive ?
-            <React.Fragment>
-              {
-                store.bets.data_megasena_to_save.flat(1).map((item, index) => {
-                  if(item.length > 0) {
-                    return (
-                      <div key={index} className="div-mega-sena" >
-                        <span className="column-mega-sena" />
-                        <div className="div-rows-mega-sena">
-                          <p><strong>{item.join(", ")}</strong></p>
-                          <p>{store.bets.date} - (R$ 4,50)</p>
-                          <p><strong className="strong-mega-sena" >Mega Sena</strong></p>
-                        </div>
+            dbInformation.map(item => {
+
+              if (lotofacilActive) {
+                if (item.game_id === 1) {
+                  return (
+                    <div key={item.id} className="div-lotofacil" >
+                      <span className="column-lotofacil" />
+                      <div className="div-rows-lotofacil">
+                        <p><strong>{item.numbers}</strong></p>
+                        <p>{item.date} - (R$ 2,50)</p>
+                        <p><strong className="strong-lotofacil" >Lotofácil</strong></p>
                       </div>
-                    )
-                  }
-                  return ''
-                })
+                    </div> 
+                  )
+                }
               }
-            </React.Fragment>
-             : ''
-          }
-          
-          {
-            quinaActive ?
-            <React.Fragment>
-              {
-                store.bets.data_quina_to_save.flat(1).map((item, index) => {
-                  if(item.length > 0) {
-                    return (
-                      <div key={index} className="div-quina" >
-                        <span className="column-quina" />
-                        <div className="div-rows-quina">
-                          <p><strong>{item.join(", ")}</strong></p>
-                          <p>{store.bets.date} - (R$ 3,50)</p>
-                          <p><strong className="strong-quina" >Quina</strong></p>
-                        </div>
+
+              if (megasenaActive) {
+                if (item.game_id === 2) {
+                  return (
+                    <div key={item.id} className="div-mega-sena" >
+                      <span className="column-mega-sena" />
+                      <div className="div-rows-mega-sena">
+                        <p><strong>{item.numbers}</strong></p>
+                        <p>{item.date} - (R$ 4,50)</p>
+                        <p><strong className="strong-mega-sena" >Mega Sena</strong></p>
                       </div>
-                    );
-                  }
-                  return ''
-                })
+                    </div>
+                  )
+                }
               }
-            </React.Fragment> : ''
+
+              if (quinaActive) {
+                if (item.game_id === 3) {
+                  return (
+                    <div key={item.id} className="div-quina" >
+                      <span className="column-quina" />
+                      <div className="div-rows-quina">
+                        <p><strong>{item.numbers}</strong></p>
+                        <p>{item.date} - (R$ 3,50)</p>
+                        <p><strong className="strong-quina" >Quina</strong></p>
+                      </div>
+                    </div>
+                  );
+                }
+              }
+            })
           }
-          
         </Games>
         </Animation>
       </Main>
